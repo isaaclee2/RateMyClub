@@ -459,21 +459,4 @@
 		transform: translateY(-3px);
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 	}
-
-	/* Responsive adjustments */
-	@media (max-width: 768px) {
-		.search-bar-container {
-			flex-direction: column;
-			align-items: center;
-		}
-
-		.search-bar,
-		.category-filter {
-			width: 90%;
-		}
-
-		.clubs-grid {
-			grid-template-columns: 1fr;
-		}
-	}
 </style>

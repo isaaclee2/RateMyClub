@@ -151,7 +151,7 @@
 							</div>
 						</div>
 						<div class="sub-ratings">
-							<h1 class="breakdown-header">&nbsp</h1>
+							<div class="breakdown-header">&nbsp</div>
 							<!--This is for empty space-->
 							<div class="sub-star-container">
 								<div class="sub-star">★★★★★</div>
