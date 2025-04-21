@@ -249,7 +249,18 @@
 	</div>
 
 	<div class="reviews-container">
-		<h1 class="reviews-header">Reviews ({data.club.num_ratings})</h1>
+		<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
+		{#if data.reviews.length === 0}
+			<p>No reviews yet. Be the first to write one!</p>
+		{:else}
+			<div class="reviews-list">
+				{#each data.reviews as review}
+					<div class="review-item">
+						<p>{review.review}</p>
+					</div>
+				{/each}
+			</div>
+		{/if}
 	</div>
 </div>
 

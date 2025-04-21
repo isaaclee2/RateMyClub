@@ -173,12 +173,23 @@
 		// Filter by category first
 		let categoryFiltered = data.clubs;
 		if (selectedCategory !== 'All Categories') {
-			categoryFiltered = data.clubs.filter(
-				(club) =>
-					club.categories &&
-					((Array.isArray(club.categories) && club.categories.includes(selectedCategory)) ||
-						(typeof club.categories === 'string' && club.categories === selectedCategory))
-			);
+			categoryFiltered = data.clubs.filter((club) => {
+				if (!club.categories) return false;
+
+				// Handle array of categories
+				if (Array.isArray(club.categories)) {
+					return club.categories.includes(selectedCategory);
+				}
+
+				// Handle semicolon-separated string categories
+				if (typeof club.categories === 'string') {
+					// Split the string by semicolons and trim whitespace
+					const categoriesArray = club.categories.split(';').map((cat) => cat.trim());
+					return categoriesArray.includes(selectedCategory);
+				}
+
+				return false;
+			});
 		}
 
 		// Apply fuzzy search if there's a search query

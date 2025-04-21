@@ -1,25 +1,46 @@
-// src/routes/clubs/[slug]/+page.js
 import { supabase } from '$lib/supabaseClient';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }) {
     const { slug } = params;
+    console.log("Loading club with slug:", slug);
 
-    const { data, error } = await supabase
+    // Fetch club data
+    const { data: clubData, error: clubError } = await supabase
         .from('clubs')
         .select()
         .eq('slug', slug)
         .single();
 
-    if (error) {
-        console.error(error);
+    if (clubError) {
+        console.error(clubError);
         return {
             status: 404,
             error: new Error('Club not found'),
         };
     }
 
+    console.log("Club data:", clubData);
+    console.log("Club ID:", clubData.id);
+
+    // Fetch reviews for this club
+    const { data: reviewsData, error: reviewsError } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('club_id', clubData.id)
+        .order('time', { ascending: false });
+
+    if (reviewsError) {
+        console.error("Error fetching reviews:", reviewsError);
+    }
+
+
+    console.log("Reviews data:", reviewsData);
+    console.log("Number of reviews:", reviewsData?.length || 0);
+
+
     return {
-        club: data
+        club: clubData,
+        reviews: reviewsData || []
     };
 }
