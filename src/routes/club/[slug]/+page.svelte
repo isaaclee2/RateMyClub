@@ -21,12 +21,6 @@
 </header>
 
 <div class="content-container">
-	<div class="breadcrumb">
-		<a href="/">Home</a> >
-		<a href="/all-clubs">Clubs</a> >
-		<span class="current">{data.club.name}</span>
-	</div>
-
 	<div class="header-container">
 		<img src={data.club.image} alt="No Logo :(" />
 		<div class="club-header-container">
@@ -38,12 +32,21 @@
 			<div class="overall-rating-container">
 				<h1 class="overall-rating">★★★★★</h1>
 				<h1 class="overall-score">({data.club.overall_rating})</h1>
-				<h1 class="number-of-ratings">{data.club.num_ratings} ratings</h1>
+				{#if data.reviews.length == 1}
+					<h1 class="number-of-ratings">{data.reviews.length} rating</h1>
+				{:else}
+					<h1 class="number-of-ratings">{data.reviews.length} ratings</h1>
+				{/if}
 			</div>
 		</div>
 	</div>
 
 	<hr class="hr" />
+	<div class="breadcrumb">
+		<a href="/">Home</a> >
+		<a href="/all-clubs">Clubs</a> >
+		<span class="current">{data.club.name}</span>
+	</div>
 
 	<div class="big-container">
 		<div class="container1">
@@ -225,7 +228,7 @@
 								</div>
 							</div>
 						</div>
-						<button type="button" class="review-button">
+						<a href="/club/{data.club.slug}/review" class="review-button">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 22 22"
@@ -240,7 +243,7 @@
 								<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
 								<path d="M13.5 6.5l4 4"></path>
 							</svg>
-							Write a review</button
+							Write a review</a
 						>
 					</div>
 				</div>
@@ -314,7 +317,7 @@
 	}
 
 	.breadcrumb {
-		margin-bottom: 10px;
+		margin-bottom: 20px;
 		font-size: 14px;
 		color: #666;
 		margin-left: 10px;
@@ -333,10 +336,11 @@
 	.header-container {
 		display: flex;
 		flex-direction: row;
+		margin-top: 20px;
 	}
 	img {
 		height: 80px;
-		margin-right: 15px;
+		margin-right: 10px;
 		margin-top: 10px;
 	}
 
