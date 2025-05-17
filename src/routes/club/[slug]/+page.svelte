@@ -72,19 +72,17 @@
 							<div class="criteria">
 								<div class="criteria1">
 									<svg
-										class="h-6 w-6 text-gray-800 dark:text-white"
-										aria-hidden="true"
 										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
 										width="24"
 										height="24"
-										fill="none"
-										viewBox="0 0 24 24"
+										stroke-width="2"
 									>
 										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
 											d="M11 6.5h2M11 18h2m-7-5v-2m12 2v-2M5 8h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0 12h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm12 0h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0-12h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Z"
 										/>
 									</svg>
@@ -92,19 +90,17 @@
 								</div>
 								<div class="criteria2">
 									<svg
-										class="h-6 w-6 text-gray-800 dark:text-white"
-										aria-hidden="true"
 										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
 										width="24"
 										height="24"
-										fill="none"
-										viewBox="0 0 24 24"
+										stroke-width="2"
 									>
 										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
 											d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
 										/>
 									</svg>
@@ -114,38 +110,34 @@
 
 								<div class="criteria3">
 									<svg
-										class="h-6 w-6 text-gray-800 dark:text-white"
-										aria-hidden="true"
 										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
 										width="24"
 										height="24"
-										fill="none"
-										viewBox="0 0 24 24"
+										stroke-width="2"
 									>
-										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="2"
-											d="M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207"
-										/>
+										<path d="M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207" />
 									</svg>
+
 									Professional/Personal Development
 								</div>
 								<div class="criteria4">
 									<svg
-										class="h-6 w-6 text-gray-800 dark:text-white"
-										aria-hidden="true"
 										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
 										width="24"
 										height="24"
-										fill="none"
-										viewBox="0 0 24 24"
+										stroke-width="2"
 									>
 										<path
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-width="2"
 											d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
 										/>
 									</svg>
@@ -250,11 +242,13 @@
 			</div>
 		</div>
 	</div>
-
+	<hr class="hr1" />
 	<div class="reviews-container">
 		<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
 		{#if data.reviews.length === 0}
-			<p>No reviews yet. Be the first to write one!</p>
+			<div class="reviews-content">
+				<div class="no-reviews">No reviews yet. Be the first to write one!</div>
+			</div>
 		{:else}
 			<div class="reviews-list">
 				{#each data.reviews as review}
@@ -388,6 +382,11 @@
 
 	.hr {
 		margin-top: 10px;
+		margin-bottom: 20px;
+		width: 100%;
+	}
+	.hr1 {
+		margin-top: 30px;
 		margin-bottom: 20px;
 		width: 100%;
 	}
@@ -592,6 +591,23 @@
 		font-size: 30px;
 		margin-left: 20px;
 		margin-top: 20px;
+		padding-bottom: 20px;
+	}
+
+	.reviews-content {
+		width: 100%;
+		border-radius: 10px;
+		border-color: #dfdfdf;
+		border-width: 1px;
+		border-style: solid;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.no-reviews {
+		font-size: 18px;
+		color: #666;
+		padding: 10px;
 	}
 
 	.back-to-top {

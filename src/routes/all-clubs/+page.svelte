@@ -271,6 +271,7 @@
 		<div class="clubs-grid">
 			{#each filteredClubs as club}
 				<a href={`/club/${club.slug}`} class="club-card">
+					<img src={club.image} alt="No Logo :(" />
 					<div class="club-info">
 						<h3 class="club-name">{club.name}</h3>
 						{#if club.categories}
@@ -410,6 +411,14 @@
 		transform: translateY(-3px);
 		box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 		border-color: #ddd;
+	}
+
+	img {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		margin-right: 16px;
+		object-fit: cover;
 	}
 
 	.club-info {

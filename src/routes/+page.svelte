@@ -1,3 +1,7 @@
+<script>
+	let { data } = $props();
+</script>
+
 <header>
 	<link href="https://fonts.googleapis.com/css?family=Mulish" rel="stylesheet" />
 	<a href="/">
