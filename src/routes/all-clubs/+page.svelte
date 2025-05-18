@@ -194,7 +194,7 @@
 
 		// Apply fuzzy search if there's a search query
 		if (searchQuery.trim() === '') {
-			filteredClubs = categoryFiltered;
+			filteredClubs = [...categoryFiltered].reverse();
 		} else {
 			// Get all clubs that match fuzzy search in name or mission
 			const searchResults = categoryFiltered

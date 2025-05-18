@@ -246,14 +246,132 @@
 	<div class="reviews-container">
 		<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
 		{#if data.reviews.length === 0}
-			<div class="reviews-content">
+			<div class="no-reviews-content">
 				<div class="no-reviews">No reviews yet. Be the first to write one!</div>
 			</div>
 		{:else}
 			<div class="reviews-list">
 				{#each data.reviews as review}
 					<div class="review-item">
-						<p>{review.review}</p>
+						<div class="review-header">
+							<div class="review-meta">
+								<div class="review-date">
+									{new Date(review.time).toLocaleDateString('en-US', {
+										year: 'numeric',
+										month: 'short',
+										day: 'numeric'
+									})}
+								</div>
+								<div class="review-rating">
+									<div class="stars">
+										{#each Array(Math.floor(review.c1)) as _, i}
+											<span class="star filled">★</span>
+										{/each}
+										{#each Array(5 - Math.floor(review.c1)) as _, i}
+											<span class="star">☆</span>
+										{/each}
+									</div>
+									<div class="rating-text">{review.c1}/5</div>
+								</div>
+							</div>
+						</div>
+						<div class="review-content">
+							<p>{review.review}</p>
+						</div>
+						<div class="review-criteria">
+							<div class="criteria-item">
+								<div class="criteria-label">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="16"
+										height="16"
+										stroke-width="2"
+									>
+										<path
+											d="M11 6.5h2M11 18h2m-7-5v-2m12 2v-2M5 8h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0 12h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm12 0h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0-12h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Z"
+										/>
+									</svg>
+									Leadership: {review.c1}
+								</div>
+							</div>
+							<div class="criteria-item">
+								<div class="criteria-label">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="16"
+										height="16"
+										stroke-width="2"
+									>
+										<path
+											d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+										/>
+									</svg>
+									Inclusivity: {review.c2}
+								</div>
+							</div>
+							<div class="criteria-item">
+								<div class="criteria-label">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="16"
+										height="16"
+										stroke-width="2"
+									>
+										<path d="M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207" />
+									</svg>
+									Development: {review.c3}
+								</div>
+							</div>
+							<div class="criteria-item">
+								<div class="criteria-label">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="16"
+										height="16"
+										stroke-width="2"
+									>
+										<path
+											d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
+										/>
+									</svg>
+									Social: {review.c4}
+								</div>
+							</div>
+						</div>
+						<div class="review-membership">
+							<div class="member-info">
+								{#if review.club_num_members > 0}
+									<span class="member-badge">Member</span>
+								{:else}
+									<span class="non-member-badge">Non-Member</span>
+								{/if}
+								{#if review.club_selectivity > 0}
+									<span class="selectivity-badge">Application Required</span>
+								{:else}
+									<span class="selectivity-badge open">Open Membership</span>
+								{/if}
+							</div>
+						</div>
 					</div>
 				{/each}
 			</div>
@@ -594,7 +712,7 @@
 		padding-bottom: 20px;
 	}
 
-	.reviews-content {
+	.no-reviews-content {
 		width: 100%;
 		border-radius: 10px;
 		border-color: #dfdfdf;
@@ -608,6 +726,192 @@
 		font-size: 18px;
 		color: #666;
 		padding: 10px;
+	}
+
+	.reviews-list {
+		width: 100%;
+	}
+	.review-item {
+		width: 100%;
+		border-radius: 10px;
+		border-color: #dfdfdf;
+		border-width: 1px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+	.reviews-list {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+		margin-bottom: 40px;
+	}
+
+	.review-item {
+		background-color: white;
+		border-radius: 12px;
+		border: 1px solid #dfdfdf;
+		padding: 20px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.review-item:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	}
+
+	.review-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 15px;
+	}
+
+	.review-meta {
+		display: flex;
+		justify-content: space-between;
+		width: 100%;
+		align-items: center;
+	}
+
+	.review-date {
+		color: #666;
+		font-size: 14px;
+	}
+
+	.review-rating {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.stars {
+		color: #ffa534;
+		font-size: 18px;
+		letter-spacing: 2px;
+	}
+
+	.star.filled {
+		color: #ffa534;
+	}
+
+	.star {
+		color: #d3d3d3;
+	}
+
+	.rating-text {
+		font-size: 14px;
+		font-weight: bold;
+		color: #333;
+	}
+
+	.review-content {
+		margin-bottom: 15px;
+		line-height: 1.6;
+		color: #333;
+	}
+
+	.review-content p {
+		margin: 0;
+	}
+
+	.review-criteria {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 15px;
+		margin-bottom: 15px;
+		padding-top: 10px;
+		border-top: 1px solid #eee;
+	}
+
+	.criteria-item {
+		background-color: #f7f7f7;
+		border-radius: 8px;
+		padding: 8px 12px;
+	}
+
+	.criteria-label {
+		display: flex;
+		align-items: center;
+		gap: 5px;
+		font-size: 13px;
+		color: #555;
+	}
+
+	.criteria-label svg {
+		color: #777;
+	}
+
+	.review-membership {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.member-info {
+		display: flex;
+		gap: 10px;
+	}
+
+	.member-badge,
+	.non-member-badge,
+	.selectivity-badge {
+		font-size: 12px;
+		padding: 4px 8px;
+		border-radius: 4px;
+		font-weight: 600;
+	}
+
+	.member-badge {
+		background-color: #e8f5e9;
+		color: #2e7d32;
+	}
+
+	.non-member-badge {
+		background-color: #f5f5f5;
+		color: #757575;
+	}
+
+	.selectivity-badge {
+		background-color: #fff3e0;
+		color: #e65100;
+	}
+
+	.selectivity-badge.open {
+		background-color: #e3f2fd;
+		color: #1565c0;
+	}
+
+	.no-reviews-content {
+		width: 100%;
+		border-radius: 12px;
+		border: 1px solid #dfdfdf;
+		padding: 30px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background-color: #f9f9f9;
+	}
+
+	.no-reviews {
+		font-size: 18px;
+		color: #666;
+		text-align: center;
+	}
+
+	@media (max-width: 768px) {
+		.review-meta {
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 10px;
+		}
+
+		.review-criteria {
+			flex-direction: column;
+			gap: 8px;
+		}
 	}
 
 	.back-to-top {
