@@ -1,9 +1,11 @@
 <script>
 	import '../app.css';
-	let { children, data } = $props();
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
+
+	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
+	const user = $derived(data.session?.user);
 
 	onMount(() => {
 		const {
@@ -17,6 +19,33 @@
 		return () => subscription.unsubscribe();
 	});
 </script>
+
+<header>
+	<link href="https://fonts.googleapis.com/css?family=Mulish" rel="stylesheet" />
+	<a href="/">
+		<h1 class="title">
+			<div class="rate-my">RateMy</div>
+			<div class="club">Club</div>
+		</h1>
+	</a>
+	<nav class="links">
+		<a href="/about">
+			<h2 class="about">About</h2>
+		</a>
+		<a href="/contact">
+			<h2 class="contact">Contact Us</h2>
+		</a>
+		{#if user}
+			<form method="POST" action="/auth?/logout" class="signin-form">
+				<button type="submit" class="signin-btn logout-btn">Log Out</button>
+			</form>
+		{:else}
+			<form method="POST" action="/auth?/google" class="signin-form">
+				<button type="submit" class="signin-btn">Sign In</button>
+			</form>
+		{/if}
+	</nav>
+</header>
 
 {@render children()}
 
@@ -59,6 +88,79 @@
 </footer>
 
 <style>
+	header {
+		background-color: white;
+		height: 90px;
+		padding: 30px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-family: 'Mulish';
+	}
+	.title {
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		top: 1.8%;
+		display: flex;
+		flex-direction: row;
+		font-weight: 900;
+		font-size: 40px;
+	}
+	.club {
+		color: #c21807;
+	}
+	.links {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		margin-left: auto;
+		gap: 30px;
+		margin-right: 10px;
+		font-weight: bold;
+	}
+	.about:hover {
+		text-decoration: underline;
+	}
+	.contact:hover {
+		text-decoration: underline;
+	}
+
+	/* Sign in button styles */
+	.signin-form {
+		margin: 0;
+	}
+
+	.signin-btn {
+		background-color: #c21807;
+		color: white;
+		border: none;
+		padding: 8px 16px;
+		border-radius: 5px;
+		font-family: 'Mulish';
+		font-weight: bold;
+		font-size: 14px;
+		cursor: pointer;
+		transition: background-color 0.2s;
+	}
+
+	.signin-btn:hover {
+		background-color: #a01506;
+	}
+
+	.logout-btn {
+		background-color: #666;
+	}
+
+	.logout-btn:hover {
+		background-color: #555;
+	}
+
+	.auth-status {
+		display: flex;
+		align-items: center;
+	}
+
 	.site-footer {
 		background-color: #f7f7f7f6;
 		color: rgb(54, 54, 54);
@@ -74,6 +176,10 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr; /* Changed to 3 equal columns */
 		gap: 30px;
+	}
+
+	.footer-section {
+		display: block;
 	}
 
 	.footer-section h3 {
@@ -120,10 +226,12 @@
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		display: block;
 	}
 
 	.footer-section li {
 		margin-bottom: 8px;
+		display: block;
 	}
 
 	.footer-section a {

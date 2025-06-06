@@ -1,20 +1,5 @@
-<header>
-	<link href="https://fonts.googleapis.com/css?family=Mulish" rel="stylesheet" />
-	<a href="/">
-		<h1 class="title">
-			<div class="rate-my">RateMy</div>
-			<div class="club">Club</div>
-		</h1>
-	</a>
-	<nav class="links">
-		<a href="/about">
-			<h2 class="about">About</h2>
-		</a>
-		<a href="/contact">
-			<h2 class="contact">Contact Us</h2>
-		</a>
-	</nav>
-</header>
+<script>
+</script>
 
 <style>
 	header {
