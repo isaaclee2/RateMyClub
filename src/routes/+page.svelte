@@ -1,5 +1,30 @@
 <script>
 	let { data } = $props();
+	let showResults = $state(false);
+
+	function createSlug(text) {
+		return text
+			.toLowerCase()
+			.replace(/[^\w\s-]/g, '')
+			.replace(/\s+/g, '-')
+			.replace(/-+/g, '-')
+			.trim();
+	}
+
+	function handleSearch(event) {
+		const searchTerm = event.target.value.trim();
+		if (searchTerm.length > 0) {
+			showResults = true;
+		} else {
+			showResults = false;
+		}
+	}
+
+	function handleBlur() {
+		setTimeout(() => {
+			showResults = false;
+		}, 200);
+	}
 </script>
 
 <header>
@@ -27,14 +52,34 @@
 	</div>
 	<div class="description">Rate and review clubs at USC</div>
 	<div class="search-bar-container">
-		<input type="text" class="search-bar" placeholder="Search for a club" />
+		<input
+			type="text"
+			class="search-bar"
+			placeholder="Search for a club"
+			oninput={handleSearch}
+			onBlur={handleBlur}
+		/>
 	</div>
+	{#if showResults}
+		<div class="search-results">WHATSUP MY HOMIE</div>
+	{/if}
 	<div class="all-clubs">
 		<a href="/all-clubs">Browse all clubs</a>
 	</div>
 </div>
 
 <style>
+	.search-results {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: white;
+		padding: 20px;
+		border-radius: 10px;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		z-index: 3;
+	}
 	header {
 		background-color: white;
 		height: 90px;

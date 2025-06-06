@@ -31,7 +31,7 @@
 		"@supabase/auth-ui-shared": "^0.1.8",
 		"@supabase/auth-ui-svelte": "^0.2.9",
 		"@supabase/ssr": "^0.5.2",
-		"@supabase/supabase-js": "^2.49.4",
+		"@supabase/supabase-js": "^2.49.10",
 		"fuse.js": "^7.1.0"
 	}
 }
