@@ -156,11 +156,6 @@
 		background-color: #555;
 	}
 
-	.auth-status {
-		display: flex;
-		align-items: center;
-	}
-
 	.site-footer {
 		background-color: #f7f7f7f6;
 		color: rgb(54, 54, 54);
