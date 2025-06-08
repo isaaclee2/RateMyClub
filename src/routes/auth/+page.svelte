@@ -3,8 +3,6 @@
 	import { enhance } from '$app/forms';
 	import { page } from '$app/stores';
 	export let form;
-
-	// Check for URL error parameters
 	$: urlError = $page.url.searchParams.get('error');
 	$: errorMessage = getErrorMessage(urlError);
 
@@ -68,7 +66,7 @@
 
 <style>
 	.auth-container {
-		min-height: 100vh;
+		min-height: 80vh;
 		display: flex;
 		align-items: center;
 		justify-content: center;
