@@ -180,6 +180,10 @@
 		</div>
 	</div>
 
+	<div class="review-form-container">
+		<p>Your information will be kept confidential and your reviews will be held anonymonus.</p>
+	</div>
+
 	{#if showReviewForm}
 		<div class="review-form-container" bind:this={reviewFormRef}>
 			<h1 class="review-section-header">1. Your Information</h1>
@@ -426,6 +430,9 @@
 			></textarea>
 		</div>
 
+		<div class="review-form-container">
+			<p>Your information will be kept confidential and your reviews will be held anonymonus.</p>
+		</div>
 		<button class="submit-button" on:click>Submit Review</button>
 	{/if}
 </div>

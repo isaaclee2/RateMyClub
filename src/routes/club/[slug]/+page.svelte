@@ -75,6 +75,47 @@
 				<div class="link">
 					<a href={data.club.website} target="_blank" class="website-link">{data.club.website}</a>
 				</div>
+
+				<div class="update-section">
+					<div class="update-header">Club Board Member?</div>
+					{#if user}
+						<a href="/club/{data.club.slug}/update" class="update-info-button">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								width="18"
+								height="18"
+								stroke-width="2"
+							>
+								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+								<path d="m18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+							</svg>
+							Update club information
+						</a>
+					{:else}
+						<button onclick={openSignInPopup} class="update-info-button">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 20 20"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								width="18"
+								height="18"
+								stroke-width="2"
+							>
+								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+								<path d="m18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+							</svg>
+							Sign in to update club info
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 		<div class="container2">
@@ -426,6 +467,7 @@
 					Join our community to rate and review USC clubs! Sign in with your USC Google account to
 					get started.
 				</p>
+				<p class="popup-description">Your information will be kept confidential.</p>
 				<form method="POST" action="/auth?/google" class="google-signin-form">
 					<button type="submit" class="google-signin-btn">
 						<svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
@@ -579,6 +621,45 @@
 		border-left: 4px solid #c21807;
 		word-spacing: 2px;
 		line-height: 1.7;
+	}
+	.update-section {
+		margin-top: 30px;
+	}
+
+	.update-header {
+		font-size: 18px;
+		font-weight: 700;
+		color: #333;
+		margin-bottom: 15px;
+	}
+
+	.update-info-button {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		background-color: #666;
+		color: white;
+		padding: 10px 16px;
+		border: none;
+		border-radius: 8px;
+		text-decoration: none;
+		font-family: 'Mulish', sans-serif;
+		font-size: 14px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		margin-left: 15px;
+	}
+
+	.update-info-button:hover {
+		background-color: #555;
+		transform: translateY(-1px);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	.update-info-button svg {
+		margin-right: 0;
+		margin-top: 0;
 	}
 
 	.website-header {
