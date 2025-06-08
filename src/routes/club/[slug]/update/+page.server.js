@@ -10,7 +10,6 @@ export async function load({ locals, params }) {
     const { slug } = params;
     console.log("Loading club with slug:", slug);
 
-    // Fetch club data
     const { data: clubData, error: clubError } = await supabase
         .from('clubs')
         .select()

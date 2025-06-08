@@ -5,7 +5,6 @@ export async function load({ params }) {
     const { slug } = params;
     console.log("Loading club with slug:", slug);
 
-    // Fetch club data
     const { data: clubData, error: clubError } = await supabase
         .from('clubs')
         .select()
@@ -23,7 +22,6 @@ export async function load({ params }) {
     console.log("Club data:", clubData);
     console.log("Club ID:", clubData.id);
 
-    // Fetch reviews for this club
     const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')

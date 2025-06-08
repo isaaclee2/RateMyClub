@@ -3,19 +3,16 @@ import { redirect } from '@sveltejs/kit'
 
 export const actions = {
     google: async ({ url, locals: { supabase }, request }) => {
-        // Get the referrer (the page the user came from)
         const referrer = request.headers.get('referer')
-        let returnPath = '/all-clubs' // default fallback
+        let returnPath = '/all-clubs'
 
         if (referrer) {
             try {
                 const referrerUrl = new URL(referrer)
-                // Make sure it's from the same origin (security)
                 if (referrerUrl.origin === url.origin) {
                     returnPath = referrerUrl.pathname + referrerUrl.search
                 }
             } catch (e) {
-                // If URL parsing fails, use default
             }
         }
 
@@ -48,8 +45,6 @@ export const actions = {
             console.error('Logout error:', error)
             return { error: error.message }
         }
-
-        // Redirect to homepage after logout
         redirect(303, '/')
     }
 }

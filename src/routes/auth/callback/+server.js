@@ -13,23 +13,16 @@ export const GET = async ({ url, locals: { supabase } }) => {
             redirect(303, '/auth?error=callback_error')
         }
 
-        // Validate that the user's email is from USC domain
         if (data.user?.email) {
             const email = data.user.email.toLowerCase()
 
             if (!email.endsWith('@usc.edu')) {
-                // Sign out the user immediately
                 await supabase.auth.signOut()
-
-                // Redirect back to auth with error
                 redirect(303, '/auth?error=invalid_domain')
             }
         }
-
-        // If we get here, the email is valid
         redirect(303, next)
     }
 
-    // If no code, redirect to auth
     redirect(303, '/auth')
 }
