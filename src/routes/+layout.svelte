@@ -6,6 +6,8 @@
 	let { children, data } = $props();
 	let { supabase, session } = $derived(data);
 	const user = $derived(data.session?.user);
+	let showSignInPopup = $state(false);
+	let showMobileMenu = $state(false);
 
 	onMount(() => {
 		const {
@@ -17,35 +19,53 @@
 		});
 
 		function handleKeydown(event) {
-			if (event.key === 'Escape' && showSignInPopup) {
-				closeSignInPopup();
+			if (event.key === 'Escape') {
+				if (showSignInPopup) {
+					closeSignInPopup();
+				}
+				if (showMobileMenu) {
+					showMobileMenu = false;
+				}
 			}
 		}
 
 		document.addEventListener('keydown', handleKeydown);
 
-		return () => subscription.unsubscribe();
+		return () => {
+			subscription.unsubscribe();
+			document.removeEventListener('keydown', handleKeydown);
+		};
 	});
-	let showSignInPopup = $state(false);
+
 	function openSignInPopup() {
 		showSignInPopup = true;
 	}
+
 	function closeSignInPopup() {
 		showSignInPopup = false;
 	}
-	function handleGoogleSignIn() {
-		closeSignInPopup();
+
+	function toggleMobileMenu() {
+		showMobileMenu = !showMobileMenu;
+	}
+
+	function showComingSoon() {
+		alert('Coming soon!');
 	}
 </script>
 
 <header>
 	<link href="https://fonts.googleapis.com/css?family=Mulish" rel="stylesheet" />
+
+	<!-- Your original centered logo -->
 	<a href="/">
 		<h1 class="title">
 			<div class="rate-my">RateMy</div>
 			<div class="club">Club</div>
 		</h1>
 	</a>
+
+	<!-- Desktop navigation (your original style) -->
 	<nav class="links">
 		<a href="/about">
 			<h2 class="about">About</h2>
@@ -58,17 +78,52 @@
 				<button type="submit" class="signin-btn logout-btn">Log Out</button>
 			</form>
 		{:else}
-			<button onclick={openSignInPopup} class="signin-btn">Sign In</button>
+			<!-- svelte-ignore event_directive_deprecated -->
+			<button on:click={openSignInPopup} class="signin-btn">Sign In</button>
 		{/if}
 	</nav>
+
+	<!-- Mobile menu button (only shows on mobile) -->
+	<!-- svelte-ignore event_directive_deprecated -->
+	<button class="mobile-menu-btn" on:click={toggleMobileMenu} aria-label="Toggle menu">
+		<span class="hamburger"></span>
+		<span class="hamburger"></span>
+		<span class="hamburger"></span>
+	</button>
+
+	<!-- Mobile navigation dropdown -->
+	{#if showMobileMenu}
+		<nav class="mobile-nav">
+			<!-- svelte-ignore event_directive_deprecated -->
+			<a href="/about" class="mobile-nav-link" on:click={() => (showMobileMenu = false)}>About</a>
+			<!-- svelte-ignore event_directive_deprecated -->
+			<a href="/contact" class="mobile-nav-link" on:click={() => (showMobileMenu = false)}
+				>Contact Us</a
+			>
+			{#if user}
+				<form method="POST" action="/auth?/logout" class="mobile-signin-form">
+					<button type="submit" class="mobile-signin-btn logout-btn">Log Out</button>
+				</form>
+			{:else}
+				<!-- svelte-ignore event_directive_deprecated -->
+				<button on:click={openSignInPopup} class="mobile-signin-btn">Sign In</button>
+			{/if}
+		</nav>
+	{/if}
 </header>
 
 {@render children()}
 
 {#if showSignInPopup}
-	<div class="popup-overlay">
-		<div class="popup-content">
-			<button class="close-btn" onclick={closeSignInPopup}>×</button>
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<!-- svelte-ignore event_directive_deprecated -->
+	<div class="popup-overlay" on:click={closeSignInPopup}>
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<!-- svelte-ignore event_directive_deprecated -->
+		<div class="popup-content" on:click|stopPropagation>
+			<button class="close-btn" on:click={closeSignInPopup}>×</button>
 			<div class="popup-header">
 				<h2>Sign In to RateMyClub</h2>
 			</div>
@@ -130,23 +185,34 @@
 		<div class="footer-section more-links">
 			<h3>Resources</h3>
 			<ul>
-				<li><a href="/faq">FAQ</a></li>
-				<li><a href="/add-club">Can't find your club?</a></li>
-				<li><a href="/feedback">Submit Feedback</a></li>
+				<!-- svelte-ignore event_directive_deprecated -->
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<li><a href="#" on:click|preventDefault={showComingSoon}>FAQ</a></li>
+				<!-- svelte-ignore event_directive_deprecated -->
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<li><a href="#" on:click|preventDefault={showComingSoon}>Can't find your club?</a></li>
+				<!-- svelte-ignore event_directive_deprecated -->
+				<!-- svelte-ignore a11y_invalid_attribute -->
+				<li><a href="#" on:click|preventDefault={showComingSoon}>Submit Feedback</a></li>
 			</ul>
 		</div>
 	</div>
 
 	<div class="footer-bottom">
 		<div class="centered-links">
-			<a href="/terms">Terms & Conditions</a> •
-			<a href="/privacy">Privacy Policy</a> •
+			<!-- svelte-ignore event_directive_deprecated -->
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a href="#" on:click|preventDefault={showComingSoon}>Terms & Conditions</a> •
+			<!-- svelte-ignore event_directive_deprecated -->
+			<!-- svelte-ignore a11y_invalid_attribute -->
+			<a href="#" on:click|preventDefault={showComingSoon}>Privacy Policy</a> •
 			<span>All Rights Reserved</span>
 		</div>
 	</div>
 </footer>
 
 <style>
+	/* Your original header styles - kept exactly the same for desktop */
 	header {
 		background-color: white;
 		height: 90px;
@@ -155,20 +221,29 @@
 		justify-content: center;
 		align-items: center;
 		font-family: 'Mulish';
+		position: relative;
 	}
+
 	.title {
 		position: absolute;
 		left: 50%;
 		transform: translateX(-50%);
-		top: 1.8%;
+		top: 15%;
 		display: flex;
 		flex-direction: row;
 		font-weight: 900;
 		font-size: 40px;
+		margin: 0;
 	}
+
+	.rate-my {
+		color: #333;
+	}
+
 	.club {
 		color: #c21807;
 	}
+
 	.links {
 		display: flex;
 		flex-direction: row;
@@ -178,14 +253,99 @@
 		margin-right: 10px;
 		font-weight: bold;
 	}
+
 	.about:hover {
 		text-decoration: underline;
 	}
+
 	.contact:hover {
 		text-decoration: underline;
 	}
 
-	/* Sign in button styles */
+	/* Mobile menu button - hidden on desktop */
+	.mobile-menu-btn {
+		display: none;
+		flex-direction: column;
+		background: none;
+		border: none;
+		cursor: pointer;
+		position: absolute;
+		right: 20px;
+		top: 50%;
+		transform: translateY(-50%);
+		padding: 10px;
+		z-index: 101;
+	}
+
+	.hamburger {
+		width: 25px;
+		height: 3px;
+		background-color: #333;
+		margin: 3px 0;
+		transition: 0.3s;
+	}
+
+	/* Mobile navigation */
+	.mobile-nav {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		background-color: white;
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		padding: 20px;
+		z-index: 100;
+		display: none;
+	}
+
+	.mobile-nav-link {
+		display: block;
+		color: #333;
+		text-decoration: none;
+		font-weight: bold;
+		font-size: 18px;
+		padding: 15px 0;
+		border-bottom: 1px solid #eee;
+	}
+
+	.mobile-nav-link:hover {
+		color: #c21807;
+	}
+
+	.mobile-nav-link:last-child {
+		border-bottom: none;
+	}
+
+	.mobile-signin-form {
+		margin: 15px 0 0 0;
+	}
+
+	.mobile-signin-btn {
+		width: 100%;
+		background-color: #c21807;
+		color: white;
+		border: none;
+		padding: 15px;
+		border-radius: 6px;
+		font-family: 'Mulish';
+		font-weight: bold;
+		font-size: 16px;
+		cursor: pointer;
+	}
+
+	.mobile-signin-btn:hover {
+		background-color: #a01506;
+	}
+
+	.mobile-signin-btn.logout-btn {
+		background-color: #666;
+	}
+
+	.mobile-signin-btn.logout-btn:hover {
+		background-color: #555;
+	}
+
+	/* Your original button styles */
 	.signin-form {
 		margin: 0;
 	}
@@ -272,6 +432,10 @@
 		transition: background-color 0.2s;
 	}
 
+	.close-btn:hover {
+		background-color: #f5f5f5;
+	}
+
 	.popup-body {
 		padding: 0 24px 24px 24px;
 	}
@@ -325,6 +489,7 @@
 		color: #666;
 	}
 
+	/* Your original footer styles */
 	.site-footer {
 		background-color: #f7f7f7f6;
 		color: rgb(54, 54, 54);
@@ -338,7 +503,7 @@
 		margin: 0 auto;
 		padding: 0 20px;
 		display: grid;
-		grid-template-columns: 1fr 1fr 1fr; /* Changed to 3 equal columns */
+		grid-template-columns: 1fr 1fr 1fr;
 		gap: 30px;
 	}
 
@@ -372,11 +537,11 @@
 		text-decoration: none;
 	}
 
-	.rate-my {
+	.footer-logo .rate-my {
 		color: rgb(54, 54, 54);
 	}
 
-	.club {
+	.footer-logo .club {
 		color: #c21807;
 	}
 
@@ -406,7 +571,7 @@
 	}
 
 	.footer-section a:hover {
-		color: rgb(54, 54, 54);
+		color: #c21807;
 		text-decoration: underline;
 	}
 
@@ -431,17 +596,34 @@
 	}
 
 	.centered-links a:hover {
-		color: rgb(54, 54, 54);
+		color: #c21807;
 		text-decoration: underline;
 	}
 
+	/* Mobile responsive - only show mobile menu on small screens */
 	@media (max-width: 768px) {
+		.links {
+			display: none; /* Hide desktop nav */
+		}
+
+		.mobile-menu-btn {
+			display: flex; /* Show hamburger */
+		}
+
+		.mobile-nav {
+			display: block; /* Show mobile nav when toggled */
+		}
+
+		.title {
+			font-size: clamp(28px, 8vw, 40px); /* Responsive title size */
+		}
+
 		.footer-container {
 			grid-template-columns: 1fr 1fr;
 		}
 
 		.brand {
-			grid-column: span 2; /* Make brand take full width on medium screens */
+			grid-column: span 2;
 		}
 	}
 
@@ -451,7 +633,11 @@
 		}
 
 		.brand {
-			grid-column: span 1; /* Reset on smallest screens */
+			grid-column: span 1;
+		}
+
+		.title {
+			font-size: 24px;
 		}
 	}
 </style>

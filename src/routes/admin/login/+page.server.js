@@ -20,10 +20,7 @@ export async function load({ cookies }) {
 }
 
 function isAdminEmail(email) {
-    console.log('ADMIN_EMAILS env var:', ADMIN_EMAILS);
     const adminEmails = ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase());
-    console.log('Processed admin emails:', adminEmails);
-    console.log('Checking email:', email.toLowerCase());
     return adminEmails.includes(email.toLowerCase());
 }
 
@@ -33,49 +30,38 @@ export const actions = {
         const email = data.get('email');
         const password = data.get('password');
 
-        console.log('Login attempt:');
-        console.log('Email:', email);
-        console.log('Password provided:', password ? 'Yes' : 'No');
-
-        // Check if email is in admin list
-        if (!isAdminEmail(email)) {
-            console.log('Email not in admin list');
+        // Input validation
+        if (!email || !password) {
             return {
                 success: false,
-                error: 'You are not authorized to access this admin panel.'
+                error: 'Invalid credentials.'
             };
         }
 
-        console.log('Email authorized, checking password...');
-
-        // Check password
-        if (password === ADMIN_PASSWORD) {
-            console.log('Password correct, creating token...');
-
-            // Create JWT token with email
-            const token = jwt.sign(
-                { email: email, role: 'admin' },
-                ADMIN_SECRET_KEY,
-                { expiresIn: '24h' }
-            );
-
-            cookies.set('admin_token', token, {
-                path: '/',
-                maxAge: 60 * 60 * 24, // 24 hours
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict'
-            });
-
-            console.log('Token created and cookie set, redirecting...');
-            // Don't wrap this in try-catch - redirects are supposed to throw!
-            throw redirect(302, '/admin');
+        // Check both email authorization AND password
+        // Use same error message for both failures
+        if (!isAdminEmail(email) || password !== ADMIN_PASSWORD) {
+            return {
+                success: false,
+                error: 'Invalid credentials.'
+            };
         }
 
-        console.log('Password incorrect');
-        return {
-            success: false,
-            error: 'Invalid credentials.'
-        };
+        // Success case
+        const token = jwt.sign(
+            { email: email, role: 'admin' },
+            ADMIN_SECRET_KEY,
+            { expiresIn: '24h' }
+        );
+
+        cookies.set('admin_token', token, {
+            path: '/',
+            maxAge: 60 * 60 * 24,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
+
+        throw redirect(302, '/admin');
     }
 };

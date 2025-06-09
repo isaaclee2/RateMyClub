@@ -20,13 +20,10 @@ export async function load({ cookies }) {
 
     try {
         console.log('Verifying token...');
-        console.log('Using secret key (first 10 chars):', ADMIN_SECRET_KEY.substring(0, 10));
         const decoded = jwt.verify(adminToken, ADMIN_SECRET_KEY);
-        console.log('Token decoded successfully:', decoded);
 
         // Verify the email is still in the admin list
         if (!decoded.email || !isAdminEmail(decoded.email)) {
-            console.log('Email not authorized or missing:', decoded.email);
             throw redirect(302, '/admin/login');
         }
 
@@ -36,7 +33,10 @@ export async function load({ cookies }) {
             adminEmail: decoded.email
         };
     } catch (err) {
-        console.error('Token verification failed:', err.name, err.message);
+        // Don't log sensitive JWT errors in production
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Token verification failed:', err.name);
+        }
         throw redirect(302, '/admin/login');
     }
 }

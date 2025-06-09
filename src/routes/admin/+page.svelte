@@ -3,8 +3,6 @@
 	import { enhance } from '$app/forms';
 	import { supabase } from '$lib/supabaseClient';
 
-	export let data;
-
 	let pendingReviews = [];
 	let pendingClubUpdates = [];
 	let activeTab = 'reviews';
