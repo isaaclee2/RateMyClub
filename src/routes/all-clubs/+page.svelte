@@ -194,7 +194,17 @@
 
 		// Apply fuzzy search if there's a search query
 		if (searchQuery.trim() === '') {
-			filteredClubs = [...categoryFiltered].reverse();
+			filteredClubs = [...categoryFiltered].sort((a, b) => {
+				// First sort by review count (highest first)
+				const reviewCountDiff = (b.review_count || 0) - (a.review_count || 0);
+
+				// If review counts are the same, sort alphabetically by name
+				if (reviewCountDiff === 0) {
+					return a.name.localeCompare(b.name);
+				}
+
+				return reviewCountDiff;
+			});
 		} else {
 			// Get all clubs that match fuzzy search in name or mission
 			const searchResults = categoryFiltered

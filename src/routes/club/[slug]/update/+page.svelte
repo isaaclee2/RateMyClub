@@ -155,30 +155,6 @@
 						placeholder="https://example.com"
 					/>
 				</div>
-
-				<div class="form-row">
-					<div class="form-group">
-						<label for="size">Club Size</label>
-						<select id="size" bind:value={formData.size}>
-							<option value="">Select size</option>
-							<option value="Small (1-25 members)">Small (1-25 members)</option>
-							<option value="Medium (26-75 members)">Medium (26-75 members)</option>
-							<option value="Large (76-150 members)">Large (76-150 members)</option>
-							<option value="Very Large (150+ members)">Very Large (150+ members)</option>
-						</select>
-					</div>
-
-					<div class="form-group">
-						<label for="selectivity">Selectivity</label>
-						<select id="selectivity" bind:value={formData.selectivity}>
-							<option value="">Select selectivity</option>
-							<option value="Open to all">Open to all</option>
-							<option value="Application required">Application required</option>
-							<option value="Invitation only">Invitation only</option>
-							<option value="Audition/tryout required">Audition/tryout required</option>
-						</select>
-					</div>
-				</div>
 			</section>
 
 			<!-- Submit Section -->

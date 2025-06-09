@@ -44,8 +44,14 @@
 				</div>
 			</div>
 			<div class="overall-rating-container">
-				<h1 class="overall-rating">★★★★★</h1>
-				<h1 class="overall-score">({data.club.overall_rating})</h1>
+				<h1 class="overall-rating">
+					{#each Array(5) as _, i}
+						<span class="star {i < Math.floor(data.club.overall_rating || 0) ? 'filled' : 'empty'}"
+							>★</span
+						>
+					{/each}
+				</h1>
+				<h1 class="overall-score">({data.club.overall_rating || 0})</h1>
 				{#if data.reviews.length == 1}
 					<h1 class="number-of-ratings">{data.reviews.length} rating</h1>
 				{:else}
@@ -198,16 +204,75 @@
 									</svg>
 									Social Engagement
 								</div>
+								<div class="criteria5">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="24"
+										height="24"
+										stroke-width="2"
+									>
+										<path
+											d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+										/>
+									</svg>
+									Overall Vibes
+								</div>
 							</div>
 						</div>
 						<div class="sub-ratings">
 							<div class="breakdown-header">&nbsp</div>
 							<!--This is for empty space-->
 							<div class="sub-star-container">
-								<div class="sub-star">★★★★★</div>
-								<div class="sub-star">★★★★★</div>
-								<div class="sub-star">★★★★★</div>
-								<div class="sub-star">★★★★★</div>
+								<div class="sub-star">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.leadership_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+								<div class="sub-star">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.inclusivity_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+								<div class="sub-star">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.development_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+								<div class="sub-star">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.social_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+								<div class="sub-star">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.overall_vibes_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -327,11 +392,18 @@
 		{:else}
 			<div class="reviews-list">
 				{#each data.reviews as review}
+					{@const avgRating =
+						(review.leadership_rating +
+							review.inclusivity_rating +
+							review.development_rating +
+							review.social_rating +
+							review.overall_rating) /
+						5}
 					<div class="review-item">
 						<div class="review-header">
 							<div class="review-meta">
 								<div class="review-date">
-									{new Date(review.time).toLocaleDateString('en-US', {
+									{new Date(review.created_at).toLocaleDateString('en-US', {
 										year: 'numeric',
 										month: 'short',
 										day: 'numeric'
@@ -339,19 +411,16 @@
 								</div>
 								<div class="review-rating">
 									<div class="stars">
-										{#each Array(Math.floor(review.c1)) as _, i}
-											<span class="star filled">★</span>
-										{/each}
-										{#each Array(5 - Math.floor(review.c1)) as _, i}
-											<span class="star">☆</span>
+										{#each Array(5) as _, i}
+											<span class="star {i < Math.floor(avgRating) ? 'filled' : 'empty'}">★</span>
 										{/each}
 									</div>
-									<div class="rating-text">{review.c1}/5</div>
+									<div class="rating-text">{avgRating.toFixed(1)}/5</div>
 								</div>
 							</div>
 						</div>
 						<div class="review-content">
-							<p>{review.review}</p>
+							<p>{review.review_text}</p>
 						</div>
 						<div class="review-criteria">
 							<div class="criteria-item">
@@ -371,7 +440,7 @@
 											d="M11 6.5h2M11 18h2m-7-5v-2m12 2v-2M5 8h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0 12h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm12 0h2a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Zm0-12h2a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-2a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1Z"
 										/>
 									</svg>
-									Leadership: {review.c1}
+									Leadership: {review.leadership_rating}
 								</div>
 							</div>
 							<div class="criteria-item">
@@ -391,7 +460,7 @@
 											d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
 										/>
 									</svg>
-									Inclusivity: {review.c2}
+									Inclusivity: {review.inclusivity_rating}
 								</div>
 							</div>
 							<div class="criteria-item">
@@ -409,7 +478,7 @@
 									>
 										<path d="M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207" />
 									</svg>
-									Development: {review.c3}
+									Development: {review.development_rating}
 								</div>
 							</div>
 							<div class="criteria-item">
@@ -429,22 +498,19 @@
 											d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"
 										/>
 									</svg>
-									Social: {review.c4}
+									Social: {review.social_rating}
+								</div>
+							</div>
+							<div class="criteria-item">
+								<div class="criteria-label">
+									Overall vibes: {review.overall_rating}
 								</div>
 							</div>
 						</div>
 						<div class="review-membership">
 							<div class="member-info">
-								{#if review.club_num_members > 0}
-									<span class="member-badge">Member</span>
-								{:else}
-									<span class="non-member-badge">Non-Member</span>
-								{/if}
-								{#if review.club_selectivity > 0}
-									<span class="selectivity-badge">Application Required</span>
-								{:else}
-									<span class="selectivity-badge open">Open Membership</span>
-								{/if}
+								<span class="member-badge">{review.connection}</span>
+								<span class="selectivity-badge">{review.year_joined}</span>
 							</div>
 						</div>
 					</div>
@@ -706,7 +772,7 @@
 	}
 	.box {
 		width: 100%;
-		height: 400px;
+		height: fit-content;
 		margin-top: 10px;
 		background-color: white;
 		border-radius: 20px;
@@ -742,7 +808,8 @@
 	.criteria1,
 	.criteria2,
 	.criteria3,
-	.criteria4 {
+	.criteria4,
+	.criteria5 {
 		padding-top: 5px;
 		padding-bottom: 10px;
 		display: flex;

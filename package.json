@@ -18,6 +18,7 @@
 		"@tailwindcss/container-queries": "^0.1.1",
 		"@tailwindcss/forms": "^0.5.10",
 		"@tailwindcss/typography": "^0.5.16",
+		"@types/jsonwebtoken": "^9.0.9",
 		"autoprefixer": "^10.4.20",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
@@ -32,6 +33,7 @@
 		"@supabase/auth-ui-svelte": "^0.2.9",
 		"@supabase/ssr": "^0.5.2",
 		"@supabase/supabase-js": "^2.49.10",
-		"fuse.js": "^7.1.0"
+		"fuse.js": "^7.1.0",
+		"jsonwebtoken": "^9.0.2"
 	}
 }

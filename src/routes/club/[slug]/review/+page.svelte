@@ -1,9 +1,10 @@
 <script>
+	import { supabase } from '$lib/supabaseClient';
 	export let data;
 	let showReviewForm = false; //default false
 	let reviewFormRef;
 
-	let connectoin = '';
+	let connection = '';
 	let year = '';
 
 	let reviewFormRef2;
@@ -44,7 +45,7 @@
 			return;
 		}
 
-		connectoin = connectionChoice.value;
+		connection = connectionChoice.value;
 		year = yearChoice.value;
 		showReview2 = true;
 		setTimeout(() => {
@@ -109,6 +110,55 @@
 			case 'overall':
 				overallVibes = rating;
 				break;
+		}
+	}
+
+	async function handleSubmit() {
+		if (
+			!connection ||
+			!year ||
+			!leadershipRating ||
+			!inclusivityRating ||
+			!developmentRating ||
+			!socialRating ||
+			!overallVibes ||
+			!membersOneToFour ||
+			!selectivityOneToFour ||
+			!reviewText.trim()
+		) {
+			alert('Please fill out all fields before submitting.');
+			return;
+		}
+
+		try {
+			const { data: insertResult, error } = await supabase.from('pending_reviews').insert([
+				{
+					club_id: data.club.id,
+					club_slug: data.club.slug,
+					user_email: data.session?.user?.email || 'anonymous',
+					connection: connection, // Note: you have a typo in your variable name
+					year_joined: year,
+					leadership_rating: leadershipRating,
+					inclusivity_rating: inclusivityRating,
+					development_rating: developmentRating,
+					social_rating: socialRating,
+					overall_rating: overallVibes,
+					members_estimate: membersOneToFour,
+					selectivity_estimate: selectivityOneToFour,
+					review_text: reviewText
+				}
+			]);
+
+			if (error) {
+				console.error('Error submitting review:', error);
+				alert('Error submitting review. Please try again.');
+			} else {
+				alert('Review submitted successfully! Our team will confirm your review soon.');
+				window.location.href = `/club/${data.club.slug}`;
+			}
+		} catch (err) {
+			console.error('Unexpected error:', err);
+			alert('Something went wrong. Please try again.');
 		}
 	}
 </script>
@@ -433,7 +483,7 @@
 		<div class="review-form-container">
 			<p>Your information will be kept confidential and your reviews will be held anonymonus.</p>
 		</div>
-		<button class="submit-button" on:click>Submit Review</button>
+		<button class="submit-button" on:click={handleSubmit}>Submit Review</button>
 	{/if}
 </div>
 
