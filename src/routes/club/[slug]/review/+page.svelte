@@ -136,7 +136,7 @@
 					club_id: data.club.id,
 					club_slug: data.club.slug,
 					user_email: data.session?.user?.email || 'anonymous',
-					connection: connection, // Note: you have a typo in your variable name
+					connection: connection,
 					year_joined: year,
 					leadership_rating: leadershipRating,
 					inclusivity_rating: inclusivityRating,

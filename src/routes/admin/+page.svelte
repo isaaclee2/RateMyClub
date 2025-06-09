@@ -207,6 +207,49 @@
 	function getStars(rating) {
 		return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 	}
+
+	async function confirmClubUpdate(updateId) {
+		if (
+			!confirm(
+				'Have you manually updated the club information in the database? This will mark the request as complete.'
+			)
+		) {
+			return;
+		}
+
+		try {
+			const { error } = await supabase.from('pending_club_updates').delete().eq('id', updateId);
+
+			if (error) throw error;
+
+			loadData(); // Reload all data
+			alert('Club update request marked as complete!');
+		} catch (error) {
+			console.error('Error confirming club update:', error);
+			alert('Error confirming update: ' + error.message);
+		}
+	}
+	async function rejectClubUpdate(updateId) {
+		if (
+			!confirm(
+				'Are you sure you want to reject this club update request? This will permanently delete it.'
+			)
+		) {
+			return;
+		}
+
+		try {
+			const { error } = await supabase.from('pending_club_updates').delete().eq('id', updateId);
+
+			if (error) throw error;
+
+			loadData();
+			alert('Club update request rejected and deleted.');
+		} catch (error) {
+			console.error('Error rejecting club update:', error);
+			alert('Error rejecting update');
+		}
+	}
 </script>
 
 <!-- Remove the login form section and just show admin dashboard -->
@@ -330,7 +373,70 @@
 					<p>All caught up! 🎉</p>
 				</div>
 			{:else}
-				<p>Club updates feature coming soon...</p>
+				{#each pendingClubUpdates as update}
+					<div class="update-card">
+						<div class="update-header">
+							<div class="club-info">
+								<h3>{update.club_name}</h3>
+								<span class="club-slug">/{update.club_slug}</span>
+								<span class="submitted-date">Submitted {formatDate(update.created_at)}</span>
+							</div>
+							<div class="submitter-info">
+								<span class="submitter-name">{update.submitter_name}</span>
+								<span class="submitter-email">{update.submitter_email}</span>
+								<span class="submitter-year">{update.submitter_year}</span>
+							</div>
+						</div>
+
+						<div class="proof-section">
+							<h4>Proof of Membership:</h4>
+							<p class="proof-text">"{update.proof_of_membership}"</p>
+						</div>
+
+						<div class="updates-grid">
+							{#if update.requested_mission}
+								<div class="update-item">
+									<h4>Mission Statement Update:</h4>
+									<p class="update-text">"{update.requested_mission}"</p>
+								</div>
+							{/if}
+
+							{#if update.requested_categories}
+								<div class="update-item">
+									<h4>Categories Update:</h4>
+									<p class="update-text">{update.requested_categories}</p>
+								</div>
+							{/if}
+
+							{#if update.requested_website}
+								<div class="update-item">
+									<h4>Website Update:</h4>
+									<p class="update-text">
+										<a href={update.requested_website} target="_blank" rel="noopener noreferrer">
+											{update.requested_website}
+										</a>
+									</p>
+								</div>
+							{/if}
+						</div>
+
+						<div class="database-note">
+							<p>
+								<strong>Instructions:</strong> Manually update the club information in the Supabase database,
+								then click "Confirm" below.
+							</p>
+						</div>
+
+						<div class="update-actions">
+							<button class="confirm-btn" on:click={() => confirmClubUpdate(update.id)}>
+								✓ Confirm (I updated the database)
+							</button>
+							<button class="reject-btn" on:click={() => rejectClubUpdate(update.id)}>
+								✗ Reject
+							</button>
+						</div>
+					</div>
+				{/each}
 			{/if}
 		</div>
 	{/if}
@@ -609,6 +715,199 @@
 	.reject-btn:hover {
 		background-color: #c82333;
 		transform: translateY(-1px);
+	}
+	/* Club Update Card Styles - Add to your existing admin page CSS */
+
+	.update-card {
+		background: white;
+		border-radius: 12px;
+		padding: 25px;
+		margin-bottom: 20px;
+		box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+		border: 1px solid #eee;
+	}
+
+	.update-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-bottom: 20px;
+		padding-bottom: 15px;
+		border-bottom: 1px solid #f0f0f0;
+	}
+
+	.club-info h3 {
+		margin: 0 0 5px 0;
+		color: #c21807;
+		font-size: 18px;
+		font-weight: 700;
+	}
+
+	.club-slug {
+		font-size: 12px;
+		color: #888;
+		font-family: monospace;
+		background-color: #f8f9fa;
+		padding: 2px 6px;
+		border-radius: 4px;
+		margin-right: 10px;
+	}
+
+	.submitted-date {
+		font-size: 12px;
+		color: #888;
+	}
+
+	.submitter-info {
+		text-align: right;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.submitter-name {
+		font-weight: 600;
+		color: #333;
+		font-size: 14px;
+	}
+
+	.submitter-email {
+		font-size: 12px;
+		color: #666;
+	}
+
+	.submitter-year {
+		font-size: 12px;
+		color: #666;
+		text-transform: capitalize;
+	}
+
+	.proof-section {
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #fff8e1;
+		border-radius: 8px;
+		border-left: 3px solid #ffa000;
+	}
+
+	.proof-section h4 {
+		margin: 0 0 8px 0;
+		color: #333;
+		font-size: 14px;
+	}
+
+	.proof-text {
+		margin: 0;
+		line-height: 1.5;
+		color: #555;
+		font-style: italic;
+	}
+
+	.updates-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 15px;
+		margin-bottom: 20px;
+	}
+
+	.update-item {
+		padding: 15px;
+		background-color: #f8f9fa;
+		border-radius: 8px;
+		border-left: 3px solid #c21807;
+	}
+
+	.update-item h4 {
+		margin: 0 0 8px 0;
+		color: #333;
+		font-size: 14px;
+	}
+
+	.update-text {
+		margin: 0;
+		line-height: 1.5;
+		color: #555;
+	}
+
+	.update-text a {
+		color: #c21807;
+		text-decoration: none;
+	}
+
+	.update-text a:hover {
+		text-decoration: underline;
+	}
+
+	.database-note {
+		margin-bottom: 20px;
+		padding: 12px 15px;
+		background-color: #e3f2fd;
+		border-radius: 8px;
+		border-left: 3px solid #2196f3;
+	}
+
+	.database-note p {
+		margin: 0;
+		color: #1565c0;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.update-actions {
+		display: flex;
+		gap: 12px;
+		justify-content: flex-end;
+	}
+
+	.confirm-btn,
+	.reject-btn {
+		padding: 8px 16px;
+		border: none;
+		border-radius: 6px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: all 0.2s;
+		font-size: 14px;
+	}
+
+	.confirm-btn {
+		background-color: #28a745;
+		color: white;
+	}
+
+	.confirm-btn:hover {
+		background-color: #218838;
+		transform: translateY(-1px);
+	}
+
+	.reject-btn {
+		background-color: #dc3545;
+		color: white;
+	}
+
+	.reject-btn:hover {
+		background-color: #c82333;
+		transform: translateY(-1px);
+	}
+
+	@media (max-width: 768px) {
+		.update-header {
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.submitter-info {
+			text-align: left;
+		}
+
+		.update-actions {
+			justify-content: stretch;
+		}
+
+		.confirm-btn,
+		.reject-btn {
+			flex: 1;
+		}
 	}
 
 	@media (max-width: 768px) {

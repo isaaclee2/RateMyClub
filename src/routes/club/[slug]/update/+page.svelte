@@ -1,36 +1,72 @@
 <script>
-	import { onMount } from 'svelte';
+	import { supabase } from '$lib/supabaseClient';
 	let { children, data } = $props();
-	let { supabase, session } = $derived(data);
 	const user = $derived(data.session?.user);
 
 	// Form state
 	let formData = $state({
-		mission: data.club?.mission || '',
-		categories: data.club?.categories || '',
-		website: data.club?.website || '',
-		size: data.club?.size || '',
-		selectivity: data.club?.selectivity || '',
-
 		name: '',
 		email: '',
 		year: '',
-		proofOfMembership: ''
+		proofOfMembership: '',
+		mission: '',
+		categories: '',
+		website: ''
 	});
 
-	let isSubmitting = $state(false);
 	let submitMessage = $state('');
+	let submitError = $state('');
 
-	function handleSubmit(event) {
+	async function handleSubmit(event) {
 		event.preventDefault();
-		isSubmitting = true;
-		console.log('Form submitted:', formData);
+		submitMessage = '';
+		submitError = '';
 
-		// Simulate API call
-		setTimeout(() => {
-			isSubmitting = false;
+		try {
+			// Validate required fields
+			if (!formData.name || !formData.email || !formData.year || !formData.proofOfMembership) {
+				throw new Error('Please fill in all required personal information fields');
+			}
+
+			// Check if any updates are provided
+			if (!formData.mission && !formData.categories && !formData.website) {
+				throw new Error('Please provide at least one update.');
+			}
+
+			// Insert the update request
+			const { error: insertError } = await supabase.from('pending_club_updates').insert({
+				club_id: data.club.id,
+				club_slug: data.club.slug,
+				club_name: data.club.name,
+				submitter_name: formData.name,
+				submitter_email: formData.email,
+				submitter_year: formData.year,
+				proof_of_membership: formData.proofOfMembership,
+				requested_mission: formData.mission || null,
+				requested_categories: formData.categories || null,
+				requested_website: formData.website || null
+			});
+
+			if (insertError) {
+				throw new Error(insertError.message);
+			}
+
 			submitMessage = 'Update request submitted successfully! We will review your changes.';
-		}, 1000);
+
+			// Reset form
+			formData = {
+				name: '',
+				email: '',
+				year: '',
+				proofOfMembership: '',
+				mission: '',
+				categories: '',
+				website: ''
+			};
+		} catch (error) {
+			console.error('Submission error:', error);
+			submitError = error.message;
+		}
 	}
 </script>
 
@@ -57,7 +93,7 @@
 			<p class="subtitle">Submit updates for <strong>{data.club.name}</strong></p>
 		</div>
 
-		<form onsubmit={handleSubmit} class="update-form">
+		<form on:submit={handleSubmit} class="update-form">
 			<!-- Personal Information Section -->
 			<section class="form-section">
 				<h2>Your Information</h2>
@@ -102,9 +138,9 @@
 				</div>
 
 				<div class="form-group">
-					<label for="proof">Proof of Board Membership *</label>
+					<label for="proofOfMembership">Proof of Board Membership *</label>
 					<textarea
-						id="proof"
+						id="proofOfMembership"
 						bind:value={formData.proofOfMembership}
 						required
 						placeholder="Please provide information on where we can verify your board membership (e.g., club website officer page, club social media, club constitution, contact information for faculty advisor, etc.)"
@@ -121,38 +157,53 @@
 			<section class="form-section">
 				<h2>Club Information Updates</h2>
 				<p class="section-description">
-					Update any information that needs to be changed. Leave fields unchanged if no updates are
-					needed.
+					Provide the updated information below. Only fill in fields that need to be changed.
 				</p>
 
+				<div class="current-info">
+					<h3>Current Information:</h3>
+					<div class="current-field">
+						<strong>Mission:</strong>
+						<p>{data.club.mission || 'Not set'}</p>
+					</div>
+					<div class="current-field">
+						<strong>Categories:</strong>
+						<p>{data.club.categories || 'Not set'}</p>
+					</div>
+					<div class="current-field">
+						<strong>Website:</strong>
+						<p>{data.club.website || 'Not set'}</p>
+					</div>
+				</div>
+
 				<div class="form-group">
-					<label for="mission">Mission Statement</label>
+					<label for="mission">New Mission Statement</label>
 					<textarea
 						id="mission"
 						bind:value={formData.mission}
-						placeholder="Enter the club's mission statement"
+						placeholder="Enter the updated mission statement (leave blank if no change)"
 						rows="4"
 					></textarea>
 				</div>
 
 				<div class="form-group">
-					<label for="categories">Categories</label>
+					<label for="categories">New Categories</label>
 					<input
 						type="text"
 						id="categories"
 						bind:value={formData.categories}
-						placeholder="e.g., Academic, Professional, Social, Cultural"
+						placeholder="e.g., Academic, Professional, Social, Cultural (leave blank if no change)"
 					/>
 					<small class="field-help">Separate multiple categories with commas</small>
 				</div>
 
 				<div class="form-group">
-					<label for="website">Website URL</label>
+					<label for="website">New Website URL</label>
 					<input
 						type="url"
 						id="website"
 						bind:value={formData.website}
-						placeholder="https://example.com"
+						placeholder="https://example.com (leave blank if no change)"
 					/>
 				</div>
 			</section>
@@ -179,32 +230,17 @@
 					</div>
 				{/if}
 
-				<button type="submit" class="submit-button" disabled={isSubmitting}>
-					{#if isSubmitting}
-						<svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-							<circle
-								class="opacity-25"
-								cx="12"
-								cy="12"
-								r="10"
-								stroke="currentColor"
-								stroke-width="4"
-							></circle>
-							<path
-								class="opacity-75"
-								fill="currentColor"
-								d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-							></path>
-						</svg>
-						Submitting...
-					{:else}
-						Submit Update Request
-					{/if}
-				</button>
+				{#if submitError}
+					<div class="error-message">
+						{submitError}
+					</div>
+				{/if}
+
+				<button type="submit" class="submit-button"> Submit Update Request </button>
 
 				<p class="submit-note">
-					<strong>Note:</strong> Your update request will be reviewed by our team before being published.
-					We may contact you if we need additional verification.
+					<strong>Note:</strong> Your update request will be reviewed by our team. We may contact you
+					if we need additional verification.
 				</p>
 			</section>
 		</form>
@@ -291,14 +327,34 @@
 		line-height: 1.5;
 	}
 
-	.form-group {
-		margin-bottom: 20px;
+	.current-info {
+		background-color: #f8f9fa;
+		border: 1px solid #e9ecef;
+		border-radius: 8px;
+		padding: 20px;
+		margin-bottom: 25px;
 	}
 
-	.form-row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 20px;
+	.current-info h3 {
+		margin: 0 0 15px 0;
+		color: #495057;
+		font-size: 16px;
+	}
+
+	.current-field {
+		margin-bottom: 10px;
+		font-size: 14px;
+		line-height: 1.4;
+	}
+
+	.current-field strong {
+		color: #495057;
+		display: inline-block;
+		min-width: 80px;
+	}
+
+	.form-group {
+		margin-bottom: 20px;
 	}
 
 	label {
@@ -361,6 +417,16 @@
 		font-weight: 500;
 	}
 
+	.error-message {
+		background-color: #ffebee;
+		color: #c62828;
+		padding: 12px 20px;
+		border-radius: 8px;
+		margin-bottom: 20px;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
 	.submit-button {
 		background-color: #c21807;
 		color: white;
@@ -377,31 +443,10 @@
 		font-family: 'Mulish', sans-serif;
 	}
 
-	.submit-button:hover:not(:disabled) {
+	.submit-button:hover {
 		background-color: #a01400;
 		transform: translateY(-1px);
 		box-shadow: 0 4px 12px rgba(194, 24, 7, 0.3);
-	}
-
-	.submit-button:disabled {
-		opacity: 0.7;
-		cursor: not-allowed;
-		transform: none;
-	}
-
-	.spinner {
-		width: 16px;
-		height: 16px;
-		animation: spin 1s linear infinite;
-	}
-
-	@keyframes spin {
-		from {
-			transform: rotate(0deg);
-		}
-		to {
-			transform: rotate(360deg);
-		}
 	}
 
 	.submit-note {
@@ -459,10 +504,6 @@
 
 		.form-section {
 			padding: 20px;
-		}
-
-		.form-row {
-			grid-template-columns: 1fr;
 		}
 
 		h1 {
