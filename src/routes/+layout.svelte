@@ -50,7 +50,7 @@
 	}
 
 	function showComingSoon() {
-		alert('Coming soon!');
+		alert('Coming soon! For now, please email us at ratemyclubusc@gmail.com.');
 	}
 </script>
 
@@ -176,9 +176,9 @@
 		<div class="footer-section links">
 			<h3>Quick Links</h3>
 			<ul>
-				<li><a href="/">Home</a></li>
-				<li><a href="/all-clubs">All Clubs</a></li>
-				<li><a href="/contact">Contact Us</a></li>
+				<li><a class="quick-link" href="/">Home</a></li>
+				<li><a class="quick-link" href="/all-clubs">All Clubs</a></li>
+				<li><a class="quick-link" href="/contact">Contact Us</a></li>
 			</ul>
 		</div>
 
@@ -187,13 +187,20 @@
 			<ul>
 				<!-- svelte-ignore event_directive_deprecated -->
 				<!-- svelte-ignore a11y_invalid_attribute -->
-				<li><a href="#" on:click|preventDefault={showComingSoon}>FAQ</a></li>
+				<li><a class="quick-link" href="#" on:click|preventDefault={showComingSoon}>FAQ</a></li>
 				<!-- svelte-ignore event_directive_deprecated -->
 				<!-- svelte-ignore a11y_invalid_attribute -->
-				<li><a href="#" on:click|preventDefault={showComingSoon}>Can't find your club?</a></li>
+				<li>
+					<a class="quick-link" href="#" on:click|preventDefault={showComingSoon}
+						>Can't find your club?</a
+					>
+				</li>
 				<!-- svelte-ignore event_directive_deprecated -->
 				<!-- svelte-ignore a11y_invalid_attribute -->
-				<li><a href="#" on:click|preventDefault={showComingSoon}>Submit Feedback</a></li>
+				<li>
+					<a class="quick-link" href="#" on:click|preventDefault={showComingSoon}>Submit Feedback</a
+					>
+				</li>
 			</ul>
 		</div>
 	</div>
@@ -338,11 +345,11 @@
 	}
 
 	.mobile-signin-btn.logout-btn {
-		background-color: #666;
+		background-color: #888;
 	}
 
 	.mobile-signin-btn.logout-btn:hover {
-		background-color: #555;
+		background-color: #777;
 	}
 
 	/* Your original button styles */
@@ -368,11 +375,11 @@
 	}
 
 	.logout-btn {
-		background-color: #666;
+		background-color: #888;
 	}
 
 	.logout-btn:hover {
-		background-color: #555;
+		background-color: #777;
 	}
 
 	/* Popup Styles */
@@ -640,6 +647,17 @@
 
 		.title {
 			font-size: 24px;
+		}
+	}
+	@media (max-width: 480px) {
+		h3 {
+			font-size: 12px;
+		}
+		.tagline {
+			font-size: 12px;
+		}
+		.quick-link {
+			font-size: 12px;
 		}
 	}
 </style>

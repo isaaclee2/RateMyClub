@@ -74,12 +74,16 @@
 				<div class="mission-header">Mission Statement:</div>
 				<div class="mission-statement">{data.club.mission}</div>
 
-				<div class="category-header">Categories:</div>
-				<div class="club-cateogry">{data.club.categories}</div>
+				<div class="group">
+					<div class="category-header">Categories:</div>
+					<div class="club-cateogry">{data.club.categories}</div>
+				</div>
 
-				<div class="website-header">Website:</div>
-				<div class="link">
-					<a href={data.club.website} target="_blank" class="website-link">{data.club.website}</a>
+				<div class="group">
+					<div class="website-header">Website:</div>
+					<div class="link">
+						<a href={data.club.website} target="_blank" class="website-link">{data.club.website}</a>
+					</div>
 				</div>
 
 				<div class="update-section">
@@ -128,11 +132,12 @@
 			<div class="box">
 				<div class="box-header-container">
 					<div class="breakdown-container">
-						<div class="sub-container">
-							<h1 class="breakdown-header">Rating breakdown:</h1>
-							<div class="criteria">
-								<div class="criteria1">
+						<h1 class="breakdown-header">Rating breakdown:</h1>
+						<div class="rating-breakdown">
+							<div class="rating-item">
+								<div class="criteria-label">
 									<svg
+										class="breakdown-svg"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
 										fill="none"
@@ -149,8 +154,21 @@
 									</svg>
 									Leadership & Organization
 								</div>
-								<div class="criteria2">
+								<div class="rating-stars">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.leadership_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+							</div>
+
+							<div class="rating-item">
+								<div class="criteria-label">
 									<svg
+										class="breakdown-svg"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
 										fill="none"
@@ -165,12 +183,23 @@
 											d="M16 12h4m-2 2v-4M4 18v-1a3 3 0 0 1 3-3h4a3 3 0 0 1 3 3v1a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1Zm8-10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
 										/>
 									</svg>
-
 									Inclusivity & Diversity
 								</div>
+								<div class="rating-stars">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.inclusivity_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+							</div>
 
-								<div class="criteria3">
+							<div class="rating-item">
+								<div class="criteria-label">
 									<svg
+										class="breakdown-svg"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
 										fill="none"
@@ -183,11 +212,23 @@
 									>
 										<path d="M4 4.5V19a1 1 0 0 0 1 1h15M7 14l4-4 4 4 5-5m0 0h-3.207M20 9v3.207" />
 									</svg>
-
 									Professional/Personal Development
 								</div>
-								<div class="criteria4">
+								<div class="rating-stars">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.development_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+							</div>
+
+							<div class="rating-item">
+								<div class="criteria-label">
 									<svg
+										class="breakdown-svg"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
 										fill="none"
@@ -204,8 +245,21 @@
 									</svg>
 									Social Engagement
 								</div>
-								<div class="criteria5">
+								<div class="rating-stars">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(data.club.social_rating || 0)
+												? 'filled'
+												: 'empty'}">★</span
+										>
+									{/each}
+								</div>
+							</div>
+
+							<div class="rating-item">
+								<div class="criteria-label">
 									<svg
+										class="breakdown-svg"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 24 24"
 										fill="none"
@@ -222,49 +276,7 @@
 									</svg>
 									Overall Vibes
 								</div>
-							</div>
-						</div>
-						<div class="sub-ratings">
-							<div class="breakdown-header">&nbsp</div>
-							<!--This is for empty space-->
-							<div class="sub-star-container">
-								<div class="sub-star">
-									{#each Array(5) as _, i}
-										<span
-											class="star {i < Math.floor(data.club.leadership_rating || 0)
-												? 'filled'
-												: 'empty'}">★</span
-										>
-									{/each}
-								</div>
-								<div class="sub-star">
-									{#each Array(5) as _, i}
-										<span
-											class="star {i < Math.floor(data.club.inclusivity_rating || 0)
-												? 'filled'
-												: 'empty'}">★</span
-										>
-									{/each}
-								</div>
-								<div class="sub-star">
-									{#each Array(5) as _, i}
-										<span
-											class="star {i < Math.floor(data.club.development_rating || 0)
-												? 'filled'
-												: 'empty'}">★</span
-										>
-									{/each}
-								</div>
-								<div class="sub-star">
-									{#each Array(5) as _, i}
-										<span
-											class="star {i < Math.floor(data.club.social_rating || 0)
-												? 'filled'
-												: 'empty'}">★</span
-										>
-									{/each}
-								</div>
-								<div class="sub-star">
+								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
 											class="star {i < Math.floor(data.club.overall_vibes_rating || 0)
@@ -284,6 +296,7 @@
 									<div class="size-container">
 										<div class="size-header">
 											<svg
+												class="breakdown-svg"
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 24 24"
 												fill="none"
@@ -300,12 +313,14 @@
 												<path d="M17 10h2a2 2 0 0 1 2 2v1"></path>
 												<path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
 												<path d="M3 13v-1a2 2 0 0 1 2 -2h2"></path>
-											</svg>Club size:
+											</svg>
+											&nbspClub size:
 										</div>
 									</div>
 									<div class="selectivity-container">
 										<div class="selectivity-header">
 											<svg
+												class="breakdown-svg"
 												xmlns="http://www.w3.org/2000/svg"
 												viewBox="0 0 24 24"
 												fill="none"
@@ -325,59 +340,60 @@
 												<path d="M3 6v-1a2 2 0 0 1 2 -2h1"></path>
 												<path d="M10 3h1"></path>
 												<path d="M15 3h1a2 2 0 0 1 2 2v1"></path>
-											</svg>Selectivity:
+											</svg>
+											&nbspSelectivity:
 										</div>
 										<div class="selectivity"></div>
 									</div>
 								</div>
 								<div class="details-data">
 									<div class="size">
-										{data.club.size || 'Unknown'}
+										{'Unknown'}
 									</div>
 									<div class="selectivity">
-										{data.club.selectivity || 'Unknown'}
+										{'Unknown'}
 									</div>
 								</div>
 							</div>
 						</div>
-						{#if user}
-							<a href="/club/{data.club.slug}/review" class="review-button">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 22 22"
-									fill="none"
-									stroke="currentColor"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									width="22"
-									height="22"
-									stroke-width="2"
-								>
-									<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
-									<path d="M13.5 6.5l4 4"></path>
-								</svg>
-								Write a review
-							</a>
-						{:else}
-							<button onclick={openSignInPopup} class="review-button">
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 22 22"
-									fill="none"
-									stroke="currentColor"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									width="22"
-									height="22"
-									stroke-width="2"
-								>
-									<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
-									<path d="M13.5 6.5l4 4"></path>
-								</svg>
-								Sign in to review
-							</button>
-						{/if}
 					</div>
+					{#if user}
+						<a href="/club/{data.club.slug}/review" class="review-button">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 22 22"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								width="22"
+								height="22"
+								stroke-width="2"
+							>
+								<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+								<path d="M13.5 6.5l4 4"></path>
+							</svg>
+							&nbspWrite a review
+						</a>
+					{:else}
+						<button onclick={openSignInPopup} class="review-button">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 22 22"
+								fill="none"
+								stroke="currentColor"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								width="22"
+								height="22"
+								stroke-width="2"
+							>
+								<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4"></path>
+								<path d="M13.5 6.5l4 4"></path>
+							</svg>
+							&nbsp Sign in to review
+						</button>
+					{/if}
 				</div>
 			</div>
 		</div>
@@ -503,6 +519,21 @@
 							</div>
 							<div class="criteria-item">
 								<div class="criteria-label">
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+										width="14"
+										height="14"
+										stroke-width="2"
+									>
+										<path
+											d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+										/>
+									</svg>
 									Overall vibes: {review.overall_rating}
 								</div>
 							</div>
@@ -510,7 +541,7 @@
 						<div class="review-membership">
 							<div class="member-info">
 								<span class="member-badge">{review.connection}</span>
-								<span class="selectivity-badge">{review.year_joined}</span>
+								<span class="selectivity-badge">Joined as a {review.year_joined}</span>
 							</div>
 						</div>
 					</div>
@@ -564,7 +595,6 @@
 		</div>
 	</div>
 {/if}
-<button class="back-to-top">↑</button>
 
 <style>
 	/* Content Styling */
@@ -596,7 +626,7 @@
 	.header-container {
 		display: flex;
 		flex-direction: row;
-		margin-top: 20px;
+		margin-top: 10px;
 	}
 	img {
 		height: 80px;
@@ -670,6 +700,12 @@
 	.club-info {
 		width: 95%;
 	}
+	.group {
+		display: flex;
+		flex-direction: row;
+		margin-bottom: 40px;
+		margin-top: 10px;
+	}
 	.mission-header {
 		margin-top: 0px;
 		font-size: 20px;
@@ -677,7 +713,7 @@
 		color: #333;
 	}
 	.mission-statement {
-		margin: 20px 0px 20px 0px;
+		margin: 20px 0px 30px 0px;
 		width: fit-content;
 		background-color: #f7f7f7f6;
 		padding: 10px 10px 10px 20px;
@@ -689,36 +725,35 @@
 		line-height: 1.7;
 	}
 	.update-section {
-		margin-top: 30px;
+		margin-top: 20px;
 	}
 
 	.update-header {
-		font-size: 18px;
+		font-size: 12px;
 		font-weight: 700;
 		color: #333;
-		margin-bottom: 15px;
+		margin-bottom: 10px;
 	}
 
 	.update-info-button {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		background-color: #666;
+		background-color: #999;
 		color: white;
-		padding: 10px 16px;
+		padding: 8px 13px;
 		border: none;
 		border-radius: 8px;
 		text-decoration: none;
 		font-family: 'Mulish', sans-serif;
-		font-size: 14px;
+		font-size: 12px;
 		font-weight: 600;
 		cursor: pointer;
 		transition: all 0.2s ease;
-		margin-left: 15px;
 	}
 
 	.update-info-button:hover {
-		background-color: #555;
+		background-color: #777;
 		transform: translateY(-1px);
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 	}
@@ -729,7 +764,6 @@
 	}
 
 	.website-header {
-		margin-top: 30px;
 		font-size: 20px;
 		font-weight: 700;
 		color: #333;
@@ -738,9 +772,9 @@
 		color: #3d91cd;
 	}
 	.link {
-		margin: 0px 10px;
 		width: fit-content;
-		padding: 10px;
+		padding: 4px;
+		margin-left: 30px;
 		border-radius: 13px;
 		border-left: 0;
 	}
@@ -748,7 +782,6 @@
 		text-decoration: underline;
 	}
 	.category-header {
-		margin-top: 25px;
 		font-size: 20px;
 		font-weight: 700;
 		color: #333;
@@ -756,7 +789,6 @@
 
 	.club-cateogry {
 		width: fit-content;
-		margin-top: 15px;
 		margin-left: 15px;
 		font-size: 15px;
 		color: #666;
@@ -771,9 +803,9 @@
 		margin-left: 15px;
 	}
 	.box {
-		width: 100%;
+		width: fit-content;
 		height: fit-content;
-		margin-top: 10px;
+		margin-top: -30px;
 		background-color: white;
 		border-radius: 20px;
 		border-color: #dfdfdf;
@@ -783,53 +815,55 @@
 	.box-header-container {
 		display: flex;
 		flex-direction: column;
+		align-items: center;
+		margin-right: 10px;
 	}
 
 	.breakdown-container {
-		width: 100%;
+		width: fit-content;
 		padding: 30px;
 		padding-bottom: 0;
-		display: flex;
-		flex-direction: row;
 	}
-	.sub-container {
-		margin-left: 5px;
-	}
+
 	.breakdown-header {
 		font-weight: bold;
 		font-size: 18px;
-		margin-bottom: 10px;
+		margin-bottom: 20px;
 		color: #c21807;
 	}
-	.criteria {
-		font-size: 13px;
-		padding-top: 10px;
-	}
-	.criteria1,
-	.criteria2,
-	.criteria3,
-	.criteria4,
-	.criteria5 {
-		padding-top: 5px;
-		padding-bottom: 10px;
+
+	/* New grouped rating structure */
+	.rating-breakdown {
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
+		gap: 10px;
+	}
+
+	.rating-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 13px;
+	}
+
+	.criteria-label {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.rating-stars {
+		color: #ffa534;
+		font-size: 17px;
+		margin-left: 40px;
 	}
 
 	svg {
-		margin-right: 10px;
+		margin-right: 0;
 		margin-top: -2px;
-	}
-	.sub-star-container {
-		margin-top: 21px;
-		margin-left: 80px;
+		flex-shrink: 0;
 	}
 
-	.sub-star {
-		color: #ffa534;
-		font-size: 17px;
-		padding-bottom: 12px;
-	}
 	.club-details-container {
 		width: 100%;
 		padding: 30px;
@@ -850,7 +884,7 @@
 		margin-top: 20px;
 	}
 	.details-data {
-		margin-left: 30px;
+		margin-left: 50px;
 	}
 	.size {
 		margin-bottom: 20px;
@@ -872,15 +906,16 @@
 	}
 
 	.review-button {
-		margin-top: 55px;
-		margin-left: 50px;
-		width: 180px;
+		width: 85%;
 		height: 50px;
+		padding: 8px;
+		margin-bottom: 20px;
+		margin-right: -10px;
 		background-color: #c21807;
 		color: white;
 		border: none;
-		border-radius: 10px;
-		font-size: 17px;
+		border-radius: 8px;
+		font-size: 18px;
 		font-weight: bold;
 		transition: all 0.3s ease;
 		display: flex;
@@ -1051,11 +1086,6 @@
 			box-shadow 0.2s ease;
 	}
 
-	.review-item:hover {
-		transform: translateY(-2px);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-	}
-
 	.review-header {
 		display: flex;
 		justify-content: space-between;
@@ -1130,12 +1160,7 @@
 		display: flex;
 		align-items: center;
 		gap: 5px;
-		font-size: 13px;
-		color: #555;
-	}
-
-	.criteria-label svg {
-		color: #777;
+		font-size: 14px;
 	}
 
 	.review-membership {
@@ -1149,7 +1174,6 @@
 	}
 
 	.member-badge,
-	.non-member-badge,
 	.selectivity-badge {
 		font-size: 12px;
 		padding: 4px 8px;
@@ -1162,477 +1186,91 @@
 		color: #2e7d32;
 	}
 
-	.non-member-badge {
-		background-color: #f5f5f5;
-		color: #757575;
-	}
-
-	.selectivity-badge {
-		background-color: #fff3e0;
-		color: #e65100;
-	}
-
-	.selectivity-badge.open {
-		background-color: #e3f2fd;
-		color: #1565c0;
-	}
-
-	.back-to-top {
-		position: fixed;
-		bottom: 30px;
-		right: 30px;
-		width: 45px;
-		height: 45px;
-		border-radius: 40%;
-		background-color: #c21807;
-		color: white;
-		font-size: 22px;
-		border: none;
-		box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-		cursor: pointer;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		transition: all 0.3s ease;
-		z-index: 1000;
-	}
-	.back-to-top:hover {
-		background-color: #a01400;
-		transform: translateY(-3px);
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-	}
-
-	/* Tablet styles (768px and below) */
 	@media (max-width: 768px) {
-		.content-container {
-			padding: 0 15px;
-			margin-top: 10px;
+		.container1 {
+			width: 50%;
 		}
-
-		.header-container {
-			flex-direction: row;
-			align-items: flex-start;
-			margin-top: 30px;
-			margin-bottom: 20px;
-		}
-
-		img {
-			height: 70px;
-			width: 70px;
-			object-fit: contain;
-			margin-right: 15px;
-			margin-top: 5px;
-			flex-shrink: 0;
-		}
-
-		.club-header-container {
-			flex: 1;
-			min-width: 0; /* Allows text to wrap properly */
-		}
-
-		.club-header {
-			margin-bottom: 15px;
-			margin-left: 0;
-		}
-
-		.club-title {
-			font-size: 26px;
-			line-height: 1.2;
-			margin-bottom: 10px;
-			word-wrap: break-word;
-		}
-
-		.overall-rating-container {
-			justify-content: flex-start;
-			flex-wrap: wrap;
-			align-items: center;
-			gap: 8px;
-			margin-top: 5px;
-		}
-
-		.overall-rating {
-			margin-left: 0;
-			margin-top: 0;
-			font-size: 24px;
-			line-height: 1;
-		}
-
-		.overall-score {
-			margin-left: 5px;
-			margin-top: 0;
-			font-size: 18px;
-			line-height: 1;
-		}
-
-		.number-of-ratings {
-			margin-left: 8px;
-			margin-top: 0;
-			font-size: 14px;
-			color: #666;
-		}
-
-		.big-container {
-			flex-direction: column;
-		}
-
-		.container1,
 		.container2 {
-			width: 100%;
-			margin-left: 0;
-			padding: 10px 0;
-		}
-
-		.breakdown-container {
-			flex-direction: column;
-			padding: 20px;
-		}
-
-		.sub-ratings {
-			margin-top: 20px;
-		}
-
-		.sub-star-container {
-			margin-left: 0;
-			margin-top: 10px;
-		}
-
-		.club-details-container {
-			flex-direction: column;
-			padding: 20px;
-		}
-
-		.review-button {
-			margin-top: 20px;
-			margin-left: 0;
-			width: 100%;
-			max-width: 200px;
-		}
-
-		.reviews-list {
-			padding: 0 10px;
-		}
-
-		.review-criteria {
-			flex-direction: column;
-			gap: 10px;
-		}
-
-		.criteria-item {
-			width: 100%;
+			margin-right: 70px;
 		}
 	}
-
-	/* Mobile styles (480px and below) */
 	@media (max-width: 480px) {
-		.content-container {
-			padding: 0 12px;
+		.club-title {
+			font-size: 25px;
 		}
-
-		.header-container {
-			margin-top: 25px;
-			margin-bottom: 25px;
-		}
-
 		img {
 			height: 60px;
-			width: 60px;
-			margin-right: 12px;
+			margin-top: 10px;
 		}
-
-		.breadcrumb {
-			margin-left: 0;
-			margin-bottom: 25px;
-			font-size: 12px;
-			overflow-x: auto;
-			white-space: nowrap;
-			padding-bottom: 5px;
-		}
-
-		.club-title {
-			font-size: 22px;
-			line-height: 1.3;
-			margin-bottom: -10px;
-		}
-
 		.overall-rating {
 			font-size: 20px;
 		}
-
 		.overall-score {
-			font-size: 16px;
+			font-size: 15px;
+			margin-top: -16px;
 		}
-
 		.number-of-ratings {
-			font-size: 13px;
-			margin-left: 6px;
+			font-size: 15px;
+			margin-top: -15px;
 		}
-
+		.container1 {
+			width: 100%;
+		}
+		.container2 {
+			margin-top: 30px;
+			width: 95%;
+		}
+		.big-container {
+			flex-direction: column;
+		}
+		.group {
+			margin-bottom: 0px;
+		}
+		.mission-statement,
+		.club-cateogry,
+		.link {
+			font-size: 12px;
+		}
 		.mission-statement {
-			margin: 15px 0;
-			padding: 15px;
-			font-size: 12px;
-			border-radius: 15px;
+			margin-top: 15px;
+			margin-bottom: 15px;
 		}
-
-		.club-cateogry {
-			font-size: 12px;
+		.club-cateogry,
+		.link {
+			margin-top: -3px;
 		}
-		.website-link {
-			font-size: 12px;
-		}
-
 		.mission-header,
 		.category-header,
 		.website-header {
 			font-size: 14px;
 		}
 
-		.breakdown-container {
-			padding: 15px;
-		}
-
-		.breakdown-header,
 		.club-details-header {
-			font-size: 16px;
-		}
-
-		.criteria {
-			font-size: 12px;
-		}
-
-		.criteria1,
-		.criteria2,
-		.criteria3,
-		.criteria4,
-		.criteria5 {
-			padding: 8px 0;
-		}
-
-		.sub-star-container {
-			margin-top: 26px; /* Adjust for smaller header */
-		}
-
-		.sub-star {
-			font-size: 12px;
-			padding-bottom: 8px;
-		}
-
-		.details-container {
-			flex-direction: column;
-			gap: 15px;
-		}
-
-		.details-data {
-			margin-left: 0;
-		}
-
-		.update-info-button {
-			margin-left: 10px;
-			width: fit-content;
-			height: fit-content;
-			justify-content: center;
-			font-size: 12px;
-		}
-
-		.review-button {
-			width: 100%;
-			margin-left: 0;
-			font-size: 16px;
-		}
-
-		.reviews-header {
-			font-size: 24px;
-			margin-left: 10px;
-			text-align: center;
-		}
-
-		.review-item {
-			padding: 15px;
-			margin: 0 5px;
-		}
-
-		.review-header {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 10px;
-		}
-
-		.review-meta {
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 5px;
-			width: 100%;
-		}
-
-		.review-rating {
-			align-self: flex-end;
-		}
-
-		.stars {
-			font-size: 16px;
-		}
-
-		.review-criteria {
-			grid-template-columns: 1fr;
+			margin-top: -10px;
 		}
 
 		.criteria-label {
+			font-size: 11px;
+		}
+
+		.size-header,
+		.selectivity-header {
 			font-size: 12px;
 		}
-
-		.member-info {
-			flex-direction: column;
-			gap: 5px;
-			align-items: flex-end;
-		}
-
-		.popup-content {
-			width: 95%;
-			margin: 20px;
-			max-height: 85vh;
-		}
-
-		.popup-header {
-			padding: 20px 20px 10px 20px;
-		}
-
-		.popup-header h2 {
-			font-size: 20px;
-		}
-
-		.popup-body {
-			padding: 0 20px 20px 20px;
-		}
-
-		.google-signin-btn {
-			font-size: 14px;
-			padding: 14px 20px;
-		}
-
-		.back-to-top {
-			bottom: 20px;
-			right: 20px;
-			width: 40px;
-			height: 40px;
-			font-size: 20px;
-		}
-	}
-
-	/* Extra small mobile styles (320px and below) */
-	@media (max-width: 320px) {
-		.content-container {
-			padding: 0 8px;
-		}
-
-		.header-container {
-			margin-top: 20px;
-			margin-bottom: 20px;
-		}
-
-		img {
-			height: 50px;
-			width: 50px;
-			margin-right: 10px;
-		}
-
-		.club-title {
-			font-size: 18px;
-			line-height: 1.4;
-		}
-
-		.overall-rating {
-			font-size: 18px;
-		}
-
-		.overall-score {
-			font-size: 14px;
-		}
-
-		.number-of-ratings {
+		.size,
+		.selectivity {
 			font-size: 12px;
-			margin-left: 4px;
 		}
-
-		.mission-statement {
-			padding: 10px;
-			font-size: 13px;
+		.breakdown-svg {
+			width: 18px;
+			height: 18px;
+			margin-top: 0.5px;
 		}
-
-		.breakdown-container,
-		.club-details-container {
-			padding: 10px;
+		.rating-stars {
+			font-size: 16px;
 		}
-
-		.review-item {
-			padding: 10px;
-			margin: 0;
-		}
-
-		.popup-content {
-			width: 98%;
-			margin: 10px;
-		}
-
-		.google-signin-btn {
-			font-size: 13px;
-			padding: 12px 16px;
-		}
-	}
-
-	/* Landscape orientation adjustments for mobile */
-	@media (max-width: 768px) and (orientation: landscape) {
-		.header-container {
-			flex-direction: row;
-			justify-content: center;
-			align-items: center;
-		}
-
-		img {
-			height: 50px;
-			margin-right: 15px;
-			margin-bottom: 0;
-		}
-
-		.club-header-container {
-			align-items: flex-start;
-		}
-
-		.popup-content {
-			max-height: 90vh;
-			overflow-y: auto;
-		}
-	}
-
-	/* Touch-friendly improvements */
-	@media (hover: none) and (pointer: coarse) {
-		.update-info-button,
-		.review-button,
-		.google-signin-btn {
-			min-height: 44px; /* Minimum touch target size */
-			padding: 12px 16px;
-		}
-
-		.back-to-top {
-			min-width: 44px;
-			min-height: 44px;
-		}
-
-		.close-btn {
-			min-width: 44px;
-			min-height: 44px;
-			padding: 10px;
-		}
-
-		/* Remove hover effects on touch devices */
-		.review-item:hover {
-			transform: none;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-		}
-
-		.update-info-button:hover,
-		.review-button:hover,
-		.back-to-top:hover {
-			transform: none;
+		.reviews-header {
+			font-size: 24px;
 		}
 	}
 </style>

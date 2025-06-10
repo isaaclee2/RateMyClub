@@ -2,56 +2,12 @@
 	import { goto } from '$app/navigation';
 
 	let { data } = $props();
-	let searchValue = $state('');
-	let showResults = $state(false);
-	let searchResults = $state([]);
 
 	// Get user session
 	const user = $derived(data.session?.user);
 
-	function createSlug(text) {
-		return text
-			.toLowerCase()
-			.replace(/[^\w\s-]/g, '')
-			.replace(/\s+/g, '-')
-			.replace(/-+/g, '-')
-			.trim();
-	}
-
-	// Enhanced search function (placeholder for now)
-	function handleSearch(event) {
-		searchValue = event.target.value.trim();
-
-		if (searchValue.length > 0) {
-			showResults = true;
-			// TODO: Add actual search logic here
-			// For now, just show placeholder
-			searchResults = [{ name: 'Search coming soon!', slug: '#' }];
-		} else {
-			showResults = false;
-			searchResults = [];
-		}
-	}
-
-	function handleBlur() {
-		// Delay hiding to allow clicking on results
-		setTimeout(() => {
-			showResults = false;
-		}, 200);
-	}
-
-	function handleKeydown(event) {
-		if (event.key === 'Enter' && searchValue.trim()) {
-			// Redirect to all-clubs page with search parameter
-			goto(`/all-clubs?search=${encodeURIComponent(searchValue.trim())}`);
-		}
-	}
-
-	function selectResult(slug) {
-		if (slug !== '#') {
-			goto(`/club/${slug}`);
-		}
-		showResults = false;
+	function goToAllClubs() {
+		goto('/all-clubs');
 	}
 </script>
 
@@ -64,27 +20,22 @@
 	<div class="content">
 		<h1 class="description">Rate and review clubs at USC</h1>
 
-		<div class="search-bar-container">
-			<input
-				type="text"
-				class="search-bar"
-				placeholder="Search for a club"
-				bind:value={searchValue}
-				on:input={handleSearch}
-				on:blur={handleBlur}
-				on:keydown={handleKeydown}
-			/>
-
-			{#if showResults && searchResults.length > 0}
-				<div class="search-results">
-					{#each searchResults as result}
-						<button class="search-result-item" on:click={() => selectResult(result.slug)}>
-							{result.name}
-						</button>
-					{/each}
-				</div>
-			{/if}
-		</div>
+		<button class="search-link" on:click={goToAllClubs}>
+			<span class="search-text">Search for your club</span>
+			<svg
+				class="arrow-icon"
+				viewBox="0 0 24 24"
+				width="24"
+				height="24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M5 12h14M12 5l7 7-7 7" />
+			</svg>
+		</button>
 
 		<div class="all-clubs">
 			<a href="/all-clubs">Browse all clubs</a>
@@ -146,62 +97,49 @@
 		text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 	}
 
-	.search-bar-container {
-		position: relative;
-		width: min(90%, 500px);
-		margin-bottom: 20px;
-	}
-
-	.search-bar {
-		width: 100%;
-		padding: 15px 20px;
-		border-radius: 10px;
+	.search-link {
+		display: flex;
+		width: fit-content;
+		min-width: 320px;
+		align-items: center;
+		justify-content: center;
+		gap: 16px;
+		background: white;
+		color: #333;
+		padding: 20px 35px;
 		border: none;
-		font-size: 16px;
+		border-radius: 12px;
+		font-size: 20px;
+		font-weight: 600;
 		font-family: 'Mulish', sans-serif;
-		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-		outline: none;
-		transition: box-shadow 0.3s ease;
-	}
-
-	.search-bar:focus {
-		box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-	}
-
-	.search-results {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		background: white;
-		border-radius: 10px;
-		box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-		max-height: 200px;
-		overflow-y: auto;
-		z-index: 10;
-	}
-
-	.search-result-item {
-		width: 100%;
-		padding: 12px 20px;
-		border: none;
-		background: white;
-		text-align: left;
 		cursor: pointer;
-		font-family: 'Mulish', sans-serif;
-		transition: background-color 0.2s ease;
+		transition: all 0.3s ease;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+		margin-bottom: 20px;
+		text-decoration: none;
+		white-space: nowrap;
 	}
 
-	.search-result-item:hover {
-		background-color: #f5f5f5;
+	.search-link:hover {
+		background: #f8f9fa;
+		transform: translateY(-2px);
+		box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
 	}
 
-	.search-result-item:first-child {
-		border-radius: 10px 10px 0 0;
+	.search-link:hover .arrow-icon {
+		transform: translateX(5px);
 	}
 
-	.search-result-item:last-child {
-		border-radius: 0 0 10px 10px;
+	.search-text {
+		font-size: 20px;
+		white-space: nowrap;
+	}
+
+	.arrow-icon {
+		transition: transform 0.3s ease;
+		flex-shrink: 0;
+		width: 28px;
+		height: 28px;
 	}
 
 	.all-clubs {
@@ -225,7 +163,7 @@
 	/* Mobile Responsive */
 	@media (max-width: 768px) {
 		.container-1 {
-			height: 350px; /* Add this to match image height */
+			height: 350px;
 		}
 		.image {
 			height: 350px;
@@ -236,9 +174,21 @@
 			margin-bottom: 30px;
 		}
 
-		.search-bar {
-			padding: 12px 16px;
-			font-size: 14px;
+		.search-link {
+			min-width: 220px;
+			padding: 14px 24px;
+			font-size: 17px;
+			gap: 12px;
+			border-radius: 10px;
+		}
+
+		.search-text {
+			font-size: 17px;
+		}
+
+		.arrow-icon {
+			width: 22px;
+			height: 22px;
 		}
 
 		.all-clubs a {
@@ -248,7 +198,7 @@
 
 	@media (max-width: 480px) {
 		.container-1 {
-			height: 300px; /* Add this to match image height */
+			height: 300px;
 		}
 		.image {
 			height: 300px;
@@ -257,6 +207,22 @@
 		.description {
 			font-size: 18px;
 			margin-bottom: 20px;
+		}
+
+		.search-link {
+			min-width: 180px;
+			padding: 12px 20px;
+			font-size: 15px;
+			gap: 8px;
+		}
+
+		.search-text {
+			font-size: 15px;
+		}
+
+		.arrow-icon {
+			width: 18px;
+			height: 18px;
 		}
 
 		.content {
