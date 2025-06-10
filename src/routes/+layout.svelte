@@ -615,7 +615,9 @@
 		}
 
 		.title {
-			font-size: clamp(28px, 8vw, 40px); /* Responsive title size */
+			top: 50%;
+			transform: translate(-50%, -50%); /* Perfect centering on mobile */
+			font-size: clamp(28px, 8vw, 40px);
 		}
 
 		.footer-container {

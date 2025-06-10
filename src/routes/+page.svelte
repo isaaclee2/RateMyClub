@@ -96,7 +96,7 @@
 	.container-1 {
 		position: relative;
 		width: 100%;
-		min-height: 450px;
+		height: 450px;
 	}
 
 	.image {
@@ -224,13 +224,16 @@
 
 	/* Mobile Responsive */
 	@media (max-width: 768px) {
+		.container-1 {
+			height: 350px; /* Add this to match image height */
+		}
 		.image {
 			height: 350px;
 		}
 
 		.description {
 			font-size: 22px;
-			margin-bottom: 25px;
+			margin-bottom: 30px;
 		}
 
 		.search-bar {
@@ -244,6 +247,9 @@
 	}
 
 	@media (max-width: 480px) {
+		.container-1 {
+			height: 300px; /* Add this to match image height */
+		}
 		.image {
 			height: 300px;
 		}

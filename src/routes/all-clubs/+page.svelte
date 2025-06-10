@@ -435,4 +435,161 @@
 		transform: translateY(-3px);
 		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 	}
+	/* Mobile responsive styles - add to your existing CSS */
+
+	/* Tablet styles */
+	@media (max-width: 768px) {
+		.heading-container {
+			flex-direction: column;
+			align-items: center;
+			margin-top: 5px;
+		}
+
+		.back {
+			position: static; /* Remove absolute positioning */
+			margin-top: 0;
+			margin-bottom: 10px;
+			align-self: flex-start;
+			margin-left: 20px;
+			font-size: 16px;
+		}
+
+		.heading {
+			font-size: 24px;
+			margin-top: 10px;
+			margin-bottom: 5px;
+			text-align: center;
+			padding: 0 20px;
+		}
+
+		.search-bar-container {
+			flex-direction: column;
+			align-items: center;
+			gap: 15px;
+			padding: 0 20px;
+		}
+
+		.search-bar {
+			width: 100%;
+			max-width: 400px;
+		}
+
+		.category-filter {
+			width: 100%;
+			max-width: 400px;
+		}
+
+		.clubs-grid {
+			grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+			gap: 15px;
+		}
+
+		.club-card {
+			padding: 14px;
+		}
+
+		.club-name {
+			font-size: 15px;
+		}
+
+		.club-category {
+			font-size: 13px;
+		}
+	}
+
+	/* Mobile styles */
+	@media (max-width: 480px) {
+		.heading {
+			font-size: 20px;
+			padding: 0 15px;
+		}
+
+		.back {
+			margin-left: 15px;
+			font-size: 14px;
+		}
+
+		.search-bar-container {
+			padding: 0 15px;
+			gap: 12px;
+		}
+
+		.clubs-container {
+			padding: 0 15px;
+			width: 100%;
+			box-sizing: border-box;
+			overflow-x: hidden;
+		}
+
+		.clubs-grid {
+			grid-template-columns: 1fr; /* Single column on small screens */
+			gap: 12px;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.club-card {
+			padding: 12px;
+			width: 100%;
+			box-sizing: border-box;
+			min-width: 0;
+		}
+
+		.club-name,
+		.club-category {
+			min-width: 0;
+		}
+
+		img {
+			width: 35px;
+			height: 35px;
+			margin-right: 12px;
+		}
+
+		.club-name {
+			font-size: 14px;
+		}
+
+		.club-category {
+			font-size: 12px;
+		}
+
+		.back-to-top {
+			width: 45px;
+			height: 45px;
+			bottom: 20px;
+			right: 20px;
+			font-size: 20px;
+		}
+
+		.no-results {
+			padding: 40px 15px;
+			font-size: 14px;
+		}
+	}
+
+	/* Very small screens */
+	@media (max-width: 360px) {
+		.heading {
+			font-size: 18px;
+		}
+
+		.search-bar,
+		.category-filter {
+			font-size: 14px;
+			padding: 8px;
+		}
+
+		.club-card {
+			padding: 10px;
+		}
+
+		.club-name {
+			font-size: 13px;
+		}
+
+		.club-category {
+			font-size: 11px;
+		}
+	}
 </style>
