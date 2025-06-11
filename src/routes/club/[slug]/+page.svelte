@@ -32,6 +32,45 @@
 			document.removeEventListener('keydown', handleKeydown);
 		};
 	});
+
+	const mostFrequentClubDetails = $derived(() => {
+		if (!data.reviews || data.reviews.length === 0) {
+			return { size: 'Unknown', selectivity: 'Unknown' };
+		}
+		const sizeCount = {};
+		const selectivityCount = {};
+		data.reviews.forEach((review) => {
+			if (review.members_estimate) {
+				sizeCount[review.members_estimate] = (sizeCount[review.members_estimate] || 0) + 1;
+			}
+			if (review.selectivity_estimate) {
+				selectivityCount[review.selectivity_estimate] =
+					(selectivityCount[review.selectivity_estimate] || 0) + 1;
+			}
+		});
+
+		let mostFrequentSize = 'Unknown';
+		let maxSizeCount = 0;
+		for (const [size, count] of Object.entries(sizeCount)) {
+			if (count > maxSizeCount) {
+				maxSizeCount = count;
+				mostFrequentSize = size;
+			}
+		}
+		let mostFrequentSelectivity = 'Unknown';
+		let maxSelectivityCount = 0;
+		for (const [selectivity, count] of Object.entries(selectivityCount)) {
+			if (count > maxSelectivityCount) {
+				maxSelectivityCount = count;
+				mostFrequentSelectivity = selectivity;
+			}
+		}
+
+		return {
+			size: mostFrequentSize,
+			selectivity: mostFrequentSelectivity
+		};
+	});
 </script>
 
 <div class="content-container">
@@ -291,67 +330,81 @@
 					<div class="club-details-container">
 						<div>
 							<h1 class="club-details-header">Club details:</h1>
-							<div class="details-container">
-								<div>
-									<div class="size-container">
-										<div class="size-header">
-											<svg
-												class="breakdown-svg"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												width="24"
-												height="24"
-												stroke-width="2"
-											>
-												<path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-												<path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1"></path>
-												<path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-												<path d="M17 10h2a2 2 0 0 1 2 2v1"></path>
-												<path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
-												<path d="M3 13v-1a2 2 0 0 1 2 -2h2"></path>
-											</svg>
-											&nbspClub size:
-										</div>
+							<div class="club-details-breakdown">
+								<div class="detail-item">
+									<div class="detail-label">
+										<svg
+											class="breakdown-svg"
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											width="24"
+											height="24"
+											stroke-width="2"
+										>
+											<path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+											<path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1"></path>
+											<path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+											<path d="M17 10h2a2 2 0 0 1 2 2v1"></path>
+											<path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"></path>
+											<path d="M3 13v-1a2 2 0 0 1 2 -2h2"></path>
+										</svg>
+										Size:
 									</div>
-									<div class="selectivity-container">
-										<div class="selectivity-header">
-											<svg
-												class="breakdown-svg"
-												xmlns="http://www.w3.org/2000/svg"
-												viewBox="0 0 24 24"
-												fill="none"
-												stroke="currentColor"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-												width="24"
-												height="24"
-												stroke-width="2"
-											>
-												<path d="M15 13v4"></path>
-												<path d="M13 15h4"></path>
-												<path d="M15 15m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path>
-												<path d="M22 22l-3 -3"></path>
-												<path d="M6 18h-1a2 2 0 0 1 -2 -2v-1"></path>
-												<path d="M3 11v-1"></path>
-												<path d="M3 6v-1a2 2 0 0 1 2 -2h1"></path>
-												<path d="M10 3h1"></path>
-												<path d="M15 3h1a2 2 0 0 1 2 2v1"></path>
-											</svg>
-											&nbspSelectivity:
-										</div>
-										<div class="selectivity"></div>
+									<div class="detail-value">
+										{#if mostFrequentClubDetails().size === 'Small'}
+											Small (1-10 members)
+										{:else if mostFrequentClubDetails().size === 'Medium'}
+											Medium (10-30 members)
+										{:else if mostFrequentClubDetails().size === 'Large'}
+											Large (30-50 members)
+										{:else if mostFrequentClubDetails().size === 'Huge'}
+											Huge (50+ members)
+										{:else}
+											{mostFrequentClubDetails().size}
+										{/if}
 									</div>
 								</div>
-								<div class="details-data">
-									<div class="size">
-										{'Unknown'}
+
+								<div class="detail-item">
+									<div class="detail-label">
+										<svg
+											class="breakdown-svg"
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+											width="24"
+											height="24"
+											stroke-width="2"
+										>
+											<path d="M15 13v4"></path>
+											<path d="M13 15h4"></path>
+											<path d="M15 15m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0"></path>
+											<path d="M22 22l-3 -3"></path>
+											<path d="M6 18h-1a2 2 0 0 1 -2 -2v-1"></path>
+											<path d="M3 11v-1"></path>
+											<path d="M3 6v-1a2 2 0 0 1 2 -2h1"></path>
+											<path d="M10 3h1"></path>
+											<path d="M15 3h1a2 2 0 0 1 2 2v1"></path>
+										</svg>
+										Selectivity:
 									</div>
-									<div class="selectivity">
-										{'Unknown'}
+									<div class="detail-value">
+										{#if mostFrequentClubDetails().selectivity === 'Open to all!'}
+											Open to all!
+										{:else if mostFrequentClubDetails().selectivity === 'Moderate'}
+											Moderate (&lt;50% acceptance)
+										{:else if mostFrequentClubDetails().selectivity === 'High'}
+											High (&lt;20% acceptance)
+										{:else}
+											{mostFrequentClubDetails().selectivity}
+										{/if}
 									</div>
 								</div>
 							</div>
@@ -539,6 +592,10 @@
 							</div>
 						</div>
 						<div class="review-membership">
+							<div class="member-info">
+								<span class="estimate1">Selectivity: {review.selectivity_estimate}</span>
+								<span class="estimate2">Size: {review.members_estimate}</span>
+							</div>
 							<div class="member-info">
 								<span class="member-badge">{review.connection}</span>
 								<span class="selectivity-badge">Joined as a {review.year_joined}</span>
@@ -844,18 +901,13 @@
 		justify-content: space-between;
 		align-items: center;
 		font-size: 13px;
-	}
-
-	.criteria-label {
-		display: flex;
-		align-items: center;
-		gap: 10px;
+		min-width: 280px;
+		gap: 20px;
 	}
 
 	.rating-stars {
 		color: #ffa534;
 		font-size: 17px;
-		margin-left: 40px;
 	}
 
 	svg {
@@ -870,39 +922,43 @@
 		margin-left: 5px;
 		font-size: 14px;
 		display: flex;
-		flex-direction: row;
+		flex-direction: column;
+	}
+	.club-details-breakdown {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		margin-top: 20px;
+		width: 100%;
+	}
+
+	.detail-item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 13px;
+		width: 100%;
+	}
+	.detail-label {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex: 1;
+		font-size: 14px;
+		min-width: 0;
+	}
+
+	.detail-value {
+		color: #333;
+		font-size: 14px;
+		margin-left: 20px;
+		text-align: right;
 	}
 	.club-details-header {
 		font-weight: bold;
 		font-size: 18px;
 		margin-left: 0px;
 		color: #c21807;
-	}
-	.details-container {
-		display: flex;
-		flex-direction: row;
-		margin-top: 20px;
-	}
-	.details-data {
-		margin-left: 50px;
-	}
-	.size {
-		margin-bottom: 20px;
-	}
-	.size-container {
-		display: flex;
-		flex-direction: row;
-	}
-	.size-header {
-		display: flex;
-		flex-direction: row;
-	}
-	.selectivity-container {
-		margin-top: 20px;
-	}
-	.selectivity-header {
-		display: flex;
-		flex-direction: row;
 	}
 
 	.review-button {
@@ -1161,11 +1217,13 @@
 		align-items: center;
 		gap: 5px;
 		font-size: 14px;
+		flex: 1;
+		min-width: 0;
 	}
 
 	.review-membership {
 		display: flex;
-		justify-content: flex-end;
+		justify-content: space-between;
 	}
 
 	.member-info {
@@ -1174,16 +1232,30 @@
 	}
 
 	.member-badge,
-	.selectivity-badge {
+	.selectivity-badge,
+	.estimate1,
+	.estimate2 {
 		font-size: 12px;
 		padding: 4px 8px;
 		border-radius: 4px;
-		font-weight: 600;
+		font-weight: 900;
 	}
 
 	.member-badge {
 		background-color: #e8f5e9;
 		color: #2e7d32;
+	}
+	.selectivity-badge {
+		background-color: #d8ebff;
+		color: #0058cc;
+	}
+	.estimate1 {
+		background-color: #f9e6e6;
+		color: #e90202;
+	}
+	.estimate2 {
+		background-color: #f9f3e6;
+		color: #dc9301;
 	}
 
 	@media (max-width: 768px) {
@@ -1250,16 +1322,11 @@
 		}
 
 		.criteria-label {
-			font-size: 11px;
+			font-size: 14px;
 		}
 
-		.size-header,
-		.selectivity-header {
-			font-size: 12px;
-		}
-		.size,
-		.selectivity {
-			font-size: 12px;
+		.detail-value {
+			font-size: 14px;
 		}
 		.breakdown-svg {
 			width: 18px;
@@ -1271,6 +1338,13 @@
 		}
 		.reviews-header {
 			font-size: 24px;
+		}
+
+		.estimate1,
+		.estimate2,
+		.member-badge,
+		.selectivity-badge {
+			font-size: 8px;
 		}
 	}
 </style>

@@ -1,9 +1,17 @@
+import { redirect } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
 
-/** @type {import('./$types').PageLoad} */
-export async function load({ params }) {
+/** @type {import('./$types').PageServerLoad} */
+export async function load({ params, locals, url }) {
+    // Get session using the safeGetSession method from hooks
+    const { session, user } = await locals.safeGetSession();
+
+    // Check authentication
+    if (!session?.user) {
+        throw redirect(302, `/?redirect=${encodeURIComponent(url.pathname)}`);
+    }
+
     const { slug } = params;
-    console.log("Loading club with slug:", slug);
 
     const { data: clubData, error: clubError } = await supabase
         .from('clubs')
@@ -19,9 +27,6 @@ export async function load({ params }) {
         };
     }
 
-    console.log("Club data:", clubData);
-    console.log("Club ID:", clubData.id);
-
     const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')
@@ -32,11 +37,10 @@ export async function load({ params }) {
         console.error("Error fetching reviews:", reviewsError);
     }
 
-    console.log("Reviews data:", reviewsData);
-    console.log("Number of reviews:", reviewsData?.length || 0);
-
     return {
         club: clubData,
-        reviews: reviewsData || []
+        reviews: reviewsData || [],
+        session,
+        user
     };
 }

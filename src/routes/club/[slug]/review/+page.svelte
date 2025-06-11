@@ -1,6 +1,18 @@
 <script>
 	import { supabase } from '$lib/supabaseClient';
+	import { onMount } from 'svelte';
 	export let data;
+
+	onMount(async () => {
+		// Set the session on the client-side supabase instance
+		if (data.session) {
+			await supabase.auth.setSession({
+				access_token: data.session.access_token,
+				refresh_token: data.session.refresh_token
+			});
+			console.log('Client session set successfully');
+		}
+	});
 	let showReviewForm = false; //default false
 	let reviewFormRef;
 
@@ -131,11 +143,17 @@
 		}
 
 		try {
+			const userEmail = data.session?.user?.email;
+
+			if (!userEmail) {
+				alert('Authentication error. Please refresh the page and try again.');
+				return;
+			}
 			const { data: insertResult, error } = await supabase.from('pending_reviews').insert([
 				{
 					club_id: data.club.id,
 					club_slug: data.club.slug,
-					user_email: data.session?.user?.email || 'anonymous',
+					user_email: userEmail,
 					connection: connection,
 					year_joined: year,
 					leadership_rating: leadershipRating,
@@ -151,7 +169,7 @@
 
 			if (error) {
 				console.error('Error submitting review:', error);
-				alert('Error submitting review. Please try again.');
+				alert('Error submitting review. Please try again and make sure that you are signed in.');
 			} else {
 				alert('Review submitted successfully! Our team will confirm your review soon.');
 				window.location.href = `/club/${data.club.slug}`;

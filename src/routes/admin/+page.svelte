@@ -1,196 +1,21 @@
 <script>
-	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
-	import { supabase } from '$lib/supabaseClient';
+	import { invalidateAll } from '$app/navigation';
+	import { browser } from '$app/environment';
 
-	let pendingReviews = [];
-	let pendingClubUpdates = [];
+	export let data;
+	export let form;
+
+	console.log('Admin page data:', data);
+	console.log('Form data:', form);
+
 	let activeTab = 'reviews';
-	let loading = true;
 
-	onMount(() => {
-		loadData();
-	});
-
-	// Remove the form success watcher since login is on separate page
-
-	async function loadData() {
-		loading = true;
-		try {
-			// Load pending reviews
-			const { data: reviews, error: reviewError } = await supabase
-				.from('pending_reviews')
-				.select('*')
-				.order('created_at', { ascending: false });
-
-			if (reviewError) throw reviewError;
-			pendingReviews = reviews || [];
-
-			// Load pending club updates (if you have that table)
-			const { data: updates, error: updateError } = await supabase
-				.from('pending_club_updates')
-				.select('*')
-				.order('created_at', { ascending: false });
-
-			if (!updateError) {
-				pendingClubUpdates = updates || [];
-			}
-		} catch (error) {
-			console.error('Error loading data:', error);
-		}
-		loading = false;
-	}
-
-	async function approveReview(reviewId) {
-		try {
-			// Get the review data
-			const { data: review, error: fetchError } = await supabase
-				.from('pending_reviews')
-				.select('*')
-				.eq('id', reviewId)
-				.single();
-
-			if (fetchError) throw fetchError;
-
-			// Insert only the columns that exist in both tables
-			const { error: insertError } = await supabase.from('reviews').insert([
-				{
-					club_id: review.club_id,
-					club_slug: review.club_slug,
-					user_email: review.user_email,
-					connection: review.connection,
-					year_joined: review.year_joined,
-					leadership_rating: review.leadership_rating,
-					inclusivity_rating: review.inclusivity_rating,
-					development_rating: review.development_rating,
-					social_rating: review.social_rating,
-					overall_rating: review.overall_rating,
-					members_estimate: review.members_estimate,
-					selectivity_estimate: review.selectivity_estimate,
-					review_text: review.review_text,
-					approved_at: new Date().toISOString()
-				}
-			]);
-
-			if (insertError) throw insertError;
-
-			// Delete from pending
-			const { error: deleteError } = await supabase
-				.from('pending_reviews')
-				.delete()
-				.eq('id', reviewId);
-
-			if (deleteError) throw deleteError;
-
-			await recalculateClubStats(review.club_id);
-
-			// Reload data
-			loadData();
-			alert('Review approved successfully!');
-		} catch (error) {
-			console.error('Error approving review:', error);
-			alert('Error approving review: ' + error.message);
-		}
-	}
-
-	async function recalculateClubStats(clubId) {
-		try {
-			// Get all approved reviews for this club
-			const { data: reviews, error: reviewsError } = await supabase
-				.from('reviews')
-				.select(
-					'leadership_rating, inclusivity_rating, development_rating, social_rating, overall_rating'
-				)
-				.eq('club_id', clubId);
-
-			if (reviewsError) throw reviewsError;
-
-			if (reviews.length === 0) return;
-
-			// Calculate averages for each category
-			const totals = reviews.reduce(
-				(acc, review) => {
-					acc.leadership += review.leadership_rating;
-					acc.inclusivity += review.inclusivity_rating;
-					acc.development += review.development_rating;
-					acc.social += review.social_rating;
-					acc.overall += review.overall_rating;
-					return acc;
-				},
-				{
-					leadership: 0,
-					inclusivity: 0,
-					development: 0,
-					social: 0,
-					overall: 0
-				}
-			);
-
-			const count = reviews.length;
-			const averages = {
-				leadership_rating: Number((totals.leadership / count).toFixed(1)),
-				inclusivity_rating: Number((totals.inclusivity / count).toFixed(1)),
-				development_rating: Number((totals.development / count).toFixed(1)),
-				social_rating: Number((totals.social / count).toFixed(1)),
-				overall_vibes_rating: Number((totals.overall / count).toFixed(1))
-			};
-
-			// Calculate the club's overall rating as average of all 5 categories
-			const overallRating = Number(
-				(
-					(averages.leadership_rating +
-						averages.inclusivity_rating +
-						averages.development_rating +
-						averages.social_rating +
-						averages.overall_vibes_rating) /
-					5
-				).toFixed(1)
-			);
-
-			// Update the club's stats
-			const { error: updateError } = await supabase
-				.from('clubs')
-				.update({
-					leadership_rating: averages.leadership_rating,
-					inclusivity_rating: averages.inclusivity_rating,
-					development_rating: averages.development_rating,
-					social_rating: averages.social_rating,
-					overall_vibes_rating: averages.overall_vibes_rating,
-					overall_rating: overallRating,
-					review_count: count
-				})
-				.eq('id', clubId);
-
-			if (updateError) throw updateError;
-
-			console.log(`Updated club ${clubId} stats:`, {
-				...averages,
-				overall_rating: overallRating,
-				review_count: count
-			});
-		} catch (error) {
-			console.error('Error recalculating club stats:', error);
-			throw error; // Re-throw so approval process knows there was an issue
-		}
-	}
-
-	async function rejectReview(reviewId) {
-		if (!confirm('Are you sure you want to reject this review? This will permanently delete it.')) {
-			return;
-		}
-
-		try {
-			const { error } = await supabase.from('pending_reviews').delete().eq('id', reviewId);
-
-			if (error) throw error;
-
-			loadData();
-			alert('Review rejected and deleted.');
-		} catch (error) {
-			console.error('Error rejecting review:', error);
-			alert('Error rejecting review');
-		}
-	}
+	// Get data from server load function
+	$: pendingReviews = data.pendingReviews || [];
+	$: pendingClubUpdates = data.pendingClubUpdates || [];
+	$: console.log('Pending reviews count:', pendingReviews.length);
+	$: console.log('Pending club updates count:', pendingClubUpdates.length);
 
 	function formatDate(dateString) {
 		return new Date(dateString).toLocaleDateString('en-US', {
@@ -206,51 +31,56 @@
 		return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 	}
 
-	async function confirmClubUpdate(updateId) {
-		if (
-			!confirm(
-				'Have you manually updated the club information in the database? This will mark the request as complete.'
-			)
-		) {
-			return;
-		}
+	// Enhanced form submission with loading states (only runs on client)
+	function enhancedSubmit() {
+		if (!browser) return enhance(); // Fallback for SSR
 
-		try {
-			const { error } = await supabase.from('pending_club_updates').delete().eq('id', updateId);
+		return enhance(async ({ formElement }) => {
+			// Add loading state to the button
+			const button = formElement.querySelector('button[type="submit"]');
+			const originalText = button.textContent;
+			button.disabled = true;
+			button.textContent = 'Processing...';
 
-			if (error) throw error;
+			return async ({ result, update }) => {
+				// Re-enable button
+				button.disabled = false;
+				button.textContent = originalText;
 
-			loadData(); // Reload all data
-			alert('Club update request marked as complete!');
-		} catch (error) {
-			console.error('Error confirming club update:', error);
-			alert('Error confirming update: ' + error.message);
-		}
+				if (result.type === 'success') {
+					// Show success message
+					if (result.data?.message) {
+						alert(result.data.message);
+					}
+					// Refresh the page data
+					await invalidateAll();
+				} else if (result.type === 'failure') {
+					// Show error message
+					alert(result.data?.error || 'An error occurred');
+				}
+
+				// Don't call update() to prevent form reset
+			};
+		});
 	}
-	async function rejectClubUpdate(updateId) {
-		if (
-			!confirm(
-				'Are you sure you want to reject this club update request? This will permanently delete it.'
-			)
-		) {
-			return;
-		}
 
-		try {
-			const { error } = await supabase.from('pending_club_updates').delete().eq('id', updateId);
+	function confirmRejectReview() {
+		return confirm('Are you sure you want to reject this review? This will permanently delete it.');
+	}
 
-			if (error) throw error;
+	function confirmClubUpdate() {
+		return confirm(
+			'Have you manually updated the club information in the database? This will mark the request as complete.'
+		);
+	}
 
-			loadData();
-			alert('Club update request rejected and deleted.');
-		} catch (error) {
-			console.error('Error rejecting club update:', error);
-			alert('Error rejecting update');
-		}
+	function confirmRejectClubUpdate() {
+		return confirm(
+			'Are you sure you want to reject this club update request? This will permanently delete it.'
+		);
 	}
 </script>
 
-<!-- Remove the login form section and just show admin dashboard -->
 <div class="admin-container">
 	<div class="admin-header">
 		<h1>Admin Dashboard</h1>
@@ -271,6 +101,18 @@
 		</div>
 	</div>
 
+	<!-- Display success/error messages -->
+	{#if form?.message}
+		<div class="alert alert-success">
+			{form.message}
+		</div>
+	{/if}
+	{#if form?.error}
+		<div class="alert alert-error">
+			{form.error}
+		</div>
+	{/if}
+
 	<div class="tabs">
 		<button
 			class="tab {activeTab === 'reviews' ? 'active' : ''}"
@@ -286,9 +128,7 @@
 		</button>
 	</div>
 
-	{#if loading}
-		<div class="loading">Loading...</div>
-	{:else if activeTab === 'reviews'}
+	{#if activeTab === 'reviews'}
 		<div class="reviews-section">
 			{#if pendingReviews.length === 0}
 				<div class="empty-state">
@@ -352,12 +192,24 @@
 						{/if}
 
 						<div class="review-actions">
-							<button class="approve-btn" on:click={() => approveReview(review.id)}>
-								✓ Approve
-							</button>
-							<button class="reject-btn" on:click={() => rejectReview(review.id)}>
-								✗ Reject
-							</button>
+							<form method="POST" action="?/approveReview" use:enhancedSubmit>
+								<input type="hidden" name="reviewId" value={review.id} />
+								<button type="submit" class="approve-btn">✓ Approve</button>
+							</form>
+
+							<form
+								method="POST"
+								action="?/rejectReview"
+								use:enhancedSubmit
+								on:submit|preventDefault={(e) => {
+									if (confirmRejectReview()) {
+										e.target.submit();
+									}
+								}}
+							>
+								<input type="hidden" name="reviewId" value={review.id} />
+								<button type="submit" class="reject-btn">✗ Reject</button>
+							</form>
 						</div>
 					</div>
 				{/each}
@@ -426,12 +278,34 @@
 						</div>
 
 						<div class="update-actions">
-							<button class="confirm-btn" on:click={() => confirmClubUpdate(update.id)}>
-								✓ Confirm (I updated the database)
-							</button>
-							<button class="reject-btn" on:click={() => rejectClubUpdate(update.id)}>
-								✗ Reject
-							</button>
+							<form
+								method="POST"
+								action="?/confirmClubUpdate"
+								use:enhancedSubmit
+								on:submit|preventDefault={(e) => {
+									if (confirmClubUpdate()) {
+										e.target.submit();
+									}
+								}}
+							>
+								<input type="hidden" name="updateId" value={update.id} />
+								<button type="submit" class="confirm-btn">✓ Confirm (I updated the database)</button
+								>
+							</form>
+
+							<form
+								method="POST"
+								action="?/rejectClubUpdate"
+								use:enhancedSubmit
+								on:submit|preventDefault={(e) => {
+									if (confirmRejectClubUpdate()) {
+										e.target.submit();
+									}
+								}}
+							>
+								<input type="hidden" name="updateId" value={update.id} />
+								<button type="submit" class="reject-btn">✗ Reject</button>
+							</form>
 						</div>
 					</div>
 				{/each}
@@ -441,12 +315,31 @@
 </div>
 
 <style>
-	/* Keep all your existing admin dashboard styles, but remove login-related styles */
+	/* Keep all your existing styles and add these new alert styles */
 	.admin-container {
 		max-width: 1200px;
 		margin: 0 auto;
 		padding: 20px;
 		font-family: 'Mulish', sans-serif;
+	}
+
+	.alert {
+		padding: 12px 16px;
+		margin-bottom: 20px;
+		border-radius: 6px;
+		font-weight: 500;
+	}
+
+	.alert-success {
+		background-color: #d4edda;
+		color: #155724;
+		border: 1px solid #c3e6cb;
+	}
+
+	.alert-error {
+		background-color: #f8d7da;
+		color: #721c24;
+		border: 1px solid #f5c6cb;
 	}
 
 	.admin-header {
@@ -539,13 +432,6 @@
 
 	.tab:hover {
 		color: #c21807;
-	}
-
-	.loading {
-		text-align: center;
-		padding: 40px;
-		font-size: 18px;
-		color: #666;
 	}
 
 	.empty-state {
@@ -685,7 +571,8 @@
 	}
 
 	.approve-btn,
-	.reject-btn {
+	.reject-btn,
+	.confirm-btn {
 		padding: 8px 16px;
 		border: none;
 		border-radius: 6px;
@@ -695,12 +582,14 @@
 		font-size: 14px;
 	}
 
-	.approve-btn {
+	.approve-btn,
+	.confirm-btn {
 		background-color: #28a745;
 		color: white;
 	}
 
-	.approve-btn:hover {
+	.approve-btn:hover,
+	.confirm-btn:hover {
 		background-color: #218838;
 		transform: translateY(-1px);
 	}
@@ -714,8 +603,16 @@
 		background-color: #c82333;
 		transform: translateY(-1px);
 	}
-	/* Club Update Card Styles - Add to your existing admin page CSS */
 
+	.approve-btn:disabled,
+	.reject-btn:disabled,
+	.confirm-btn:disabled {
+		opacity: 0.6;
+		cursor: not-allowed;
+		transform: none;
+	}
+
+	/* Club Update Card Styles */
 	.update-card {
 		background: white;
 		border-radius: 12px;
@@ -734,13 +631,6 @@
 		border-bottom: 1px solid #f0f0f0;
 	}
 
-	.club-info h3 {
-		margin: 0 0 5px 0;
-		color: #c21807;
-		font-size: 18px;
-		font-weight: 700;
-	}
-
 	.club-slug {
 		font-size: 12px;
 		color: #888;
@@ -749,11 +639,6 @@
 		padding: 2px 6px;
 		border-radius: 4px;
 		margin-right: 10px;
-	}
-
-	.submitted-date {
-		font-size: 12px;
-		color: #888;
 	}
 
 	.submitter-info {
@@ -857,57 +742,6 @@
 		justify-content: flex-end;
 	}
 
-	.confirm-btn,
-	.reject-btn {
-		padding: 8px 16px;
-		border: none;
-		border-radius: 6px;
-		font-weight: 600;
-		cursor: pointer;
-		transition: all 0.2s;
-		font-size: 14px;
-	}
-
-	.confirm-btn {
-		background-color: #28a745;
-		color: white;
-	}
-
-	.confirm-btn:hover {
-		background-color: #218838;
-		transform: translateY(-1px);
-	}
-
-	.reject-btn {
-		background-color: #dc3545;
-		color: white;
-	}
-
-	.reject-btn:hover {
-		background-color: #c82333;
-		transform: translateY(-1px);
-	}
-
-	@media (max-width: 768px) {
-		.update-header {
-			flex-direction: column;
-			gap: 10px;
-		}
-
-		.submitter-info {
-			text-align: left;
-		}
-
-		.update-actions {
-			justify-content: stretch;
-		}
-
-		.confirm-btn,
-		.reject-btn {
-			flex: 1;
-		}
-	}
-
 	@media (max-width: 768px) {
 		.admin-header {
 			flex-direction: column;
@@ -925,12 +759,14 @@
 			justify-content: space-around;
 		}
 
-		.review-header {
+		.review-header,
+		.update-header {
 			flex-direction: column;
 			gap: 10px;
 		}
 
-		.user-info {
+		.user-info,
+		.submitter-info {
 			text-align: left;
 		}
 
@@ -943,12 +779,14 @@
 			gap: 8px;
 		}
 
-		.review-actions {
+		.review-actions,
+		.update-actions {
 			justify-content: stretch;
 		}
 
 		.approve-btn,
-		.reject-btn {
+		.reject-btn,
+		.confirm-btn {
 			flex: 1;
 		}
 	}
