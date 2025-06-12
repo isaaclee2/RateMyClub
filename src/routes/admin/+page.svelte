@@ -1,3 +1,4 @@
+<!-- admin  +page.svelte-->
 <script>
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
@@ -5,9 +6,6 @@
 
 	export let data;
 	export let form;
-
-	console.log('Admin page data:', data);
-	console.log('Form data:', form);
 
 	let activeTab = 'reviews';
 
@@ -32,8 +30,9 @@
 	}
 
 	// Enhanced form submission with loading states (only runs on client)
+	// Enhanced form submission with loading states (only runs on client)
 	function enhancedSubmit() {
-		if (!browser) return enhance(); // Fallback for SSR
+		if (!browser) return enhance; // Return the function, don't call it
 
 		return enhance(async ({ formElement }) => {
 			// Add loading state to the button
@@ -95,7 +94,7 @@
 					<span class="stat-label">Pending Updates</span>
 				</div>
 			</div>
-			<form method="POST" action="?/logout" use:enhance>
+			<form method="POST" action="?/logout" use:enhancedSubmit>
 				<button type="submit" class="logout-btn">Logout</button>
 			</form>
 		</div>

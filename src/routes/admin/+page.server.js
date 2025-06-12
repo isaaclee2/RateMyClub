@@ -1,8 +1,11 @@
+// admin +page.server.js
+
 import { redirect, fail } from '@sveltejs/kit';
 import { ADMIN_SECRET_KEY, ADMIN_EMAILS, SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { createClient } from '@supabase/supabase-js';
 import jwt from 'jsonwebtoken';
+const revokedTokens = new Set();
 
 // Create Supabase client with service role key for server-side operations
 const supabase = createClient(
@@ -18,7 +21,7 @@ function isAdminEmail(email) {
 async function verifyAdminToken(cookies) {
     const adminToken = cookies.get('admin_token');
 
-    if (!adminToken) {
+    if (!adminToken || revokedTokens.has(adminToken)) {
         throw redirect(302, '/admin/login');
     }
 
@@ -170,10 +173,11 @@ async function recalculateClubStats(clubId) {
 export const actions = {
     approveReview: async ({ request, cookies }) => {
         const decoded = await verifyAdminToken(cookies);
-
         try {
             const data = await request.formData();
             const reviewId = data.get('reviewId');
+
+            console.log(`[AUDIT] ${decoded.email} approved review ${reviewId} at ${new Date()}`);
 
             if (!reviewId) {
                 return fail(400, { error: 'Review ID is required' });
@@ -240,9 +244,11 @@ export const actions = {
     rejectReview: async ({ request, cookies }) => {
         const decoded = await verifyAdminToken(cookies);
 
+
         try {
             const data = await request.formData();
             const reviewId = data.get('reviewId');
+            console.log(`[AUDIT] ${decoded.email} rejected review ${reviewId} at ${new Date()}`);
 
             if (!reviewId) {
                 return fail(400, { error: 'Review ID is required' });
@@ -271,6 +277,7 @@ export const actions = {
         try {
             const data = await request.formData();
             const updateId = data.get('updateId');
+            console.log(`[AUDIT] ${decoded.email} confirmed club update ${updateId} at ${new Date()}`);
 
             if (!updateId) {
                 return fail(400, { error: 'Update ID is required' });
@@ -295,10 +302,10 @@ export const actions = {
 
     rejectClubUpdate: async ({ request, cookies }) => {
         const decoded = await verifyAdminToken(cookies);
-
         try {
             const data = await request.formData();
             const updateId = data.get('updateId');
+            console.log(`[AUDIT] ${decoded.email} rejected club update ${updateId} at ${new Date()}`);
 
             if (!updateId) {
                 return fail(400, { error: 'Update ID is required' });
@@ -322,6 +329,11 @@ export const actions = {
     },
 
     logout: async ({ cookies }) => {
+        const token = cookies.get('admin_token');
+        if (token) {
+            revokedTokens.add(token);
+            console.log(`[AUDIT] Admin logged out and token revoked at ${new Date()}`);
+        }
         cookies.delete('admin_token', { path: '/' });
         throw redirect(302, '/admin/login');
     }
