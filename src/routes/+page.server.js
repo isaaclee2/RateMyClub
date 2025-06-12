@@ -7,7 +7,7 @@ export async function load() {
         .from('clubs')
         .select('*')
         .order('review_count', { ascending: false })
-        .limit(4); // Show top 6 popular clubs
+        .limit(4);
 
     if (popularError) {
         console.error('Error fetching popular clubs:', popularError);

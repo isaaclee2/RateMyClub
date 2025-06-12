@@ -77,10 +77,6 @@
 					</a>
 				{/each}
 			</div>
-
-			<div class="view-all-container">
-				<a href="/all-clubs" class="view-all-btn">View All Clubs</a>
-			</div>
 		</div>
 	</div>
 {/if}
@@ -291,22 +287,25 @@
 		flex-direction: row;
 		gap: 60px;
 		align-items: start;
+		justify-content: center;
 	}
 
 	.step {
 		text-align: center;
 		padding: 0 20px;
+		flex: 1;
+		max-width: 300px;
 	}
 
 	.step-icon {
-		width: 80px;
-		height: 80px;
+		width: 80px !important;
+		height: 80px !important;
 		background: white;
 		border-radius: 50%;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 auto 24px;
+		margin: 0 auto 20px;
 		box-shadow: 0 4px 20px rgba(194, 24, 7, 0.1);
 		color: #c21807;
 		transition: all 0.3s ease;
@@ -329,17 +328,16 @@
 		width: 100%;
 		display: flex;
 		justify-content: center;
-		margin-top: 0px;
+		margin-top: -30px;
 	}
 	.hr {
-		margin-top: 10px;
 		width: 90%;
 		text-align: center;
 	}
 	/* Popular Clubs Section */
 	.popular-clubs {
 		background-color: white;
-		padding: 60px 0;
+		padding: 40px 0;
 		font-family: 'Mulish', sans-serif;
 	}
 
@@ -350,16 +348,16 @@
 	}
 
 	.popular-clubs-title {
-		font-size: 36px;
+		font-size: 30px;
 		font-weight: 700;
-		text-align: center;
+		text-align: left;
 		color: #333;
 		margin-bottom: 10px;
 	}
 
 	.popular-clubs-subtitle {
-		font-size: 18px;
-		text-align: center;
+		font-size: 16px;
+		text-align: left;
 		color: #666;
 		margin-bottom: 40px;
 	}
@@ -378,7 +376,7 @@
 		padding: 20px;
 		text-decoration: none;
 		color: inherit;
-		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
 		transition: all 0.3s ease;
 		border: 1px solid #eee;
 		width: 100%;
@@ -405,8 +403,8 @@
 	}
 
 	.club-image img {
-		width: 50px;
-		height: 50px;
+		width: 80px;
+		height: 80px;
 		object-fit: contain;
 		border-radius: 8px;
 		margin-top: 15px;
@@ -423,14 +421,16 @@
 	}
 
 	.club-name {
-		font-size: 18px;
+		font-size: 16px;
 		font-weight: 700;
 		color: #333;
 		margin-bottom: 12px;
+		margin-top: 0px;
 		line-height: 1.2;
 		display: -webkit-box;
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
+		line-clamp: 2;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		width: 100%;
@@ -468,29 +468,8 @@
 	.review-count {
 		font-size: 13px;
 		color: #666;
-		margin-bottom: 0;
+		margin-bottom: 0px;
 		line-height: 1;
-	}
-
-	.view-all-container {
-		text-align: center;
-	}
-
-	.view-all-btn {
-		display: inline-block;
-		background-color: #c21807;
-		color: white;
-		padding: 12px 30px;
-		border-radius: 8px;
-		text-decoration: none;
-		font-weight: 600;
-		font-size: 16px;
-		transition: all 0.3s ease;
-	}
-
-	.view-all-btn:hover {
-		background-color: #b11800;
-		box-shadow: 0 4px 15px rgba(194, 24, 7, 0.3);
 	}
 
 	/* Tablet/Desktop - larger squares */
@@ -504,12 +483,6 @@
 			max-width: 280px;
 			padding: 25px;
 		}
-
-		.club-image img {
-			width: 60px;
-			height: 60px;
-		}
-
 		.club-name {
 			font-size: 20px;
 			margin-bottom: 15px;
@@ -531,11 +504,11 @@
 	/* Medium screens - medium squares */
 	@media (max-width: 768px) and (min-width: 481px) {
 		.popular-clubs-title {
-			font-size: 28px;
+			font-size: 24px;
 		}
 
 		.popular-clubs-subtitle {
-			font-size: 16px;
+			font-size: 14px;
 		}
 
 		.clubs-grid {
@@ -549,8 +522,8 @@
 		}
 
 		.club-image img {
-			width: 45px;
-			height: 45px;
+			width: 60px !important;
+			height: 60px !important;
 		}
 
 		.club-name {
@@ -578,7 +551,7 @@
 		}
 
 		.popular-clubs-title {
-			font-size: 24px;
+			font-size: 20px;
 		}
 
 		.popular-clubs-subtitle {
@@ -600,8 +573,8 @@
 		}
 
 		.club-image img {
-			width: 35px;
-			height: 35px;
+			width: 50px;
+			height: 50px;
 		}
 
 		.club-name {
@@ -715,28 +688,21 @@
 			padding: 15px;
 		}
 
-		.how-it-works {
-			padding: 10px;
-		}
 		.how-it-works-container {
 			margin-bottom: -30px;
 		}
 
-		.step {
-			padding: 0 15px;
-		}
-
 		.step-icon {
-			width: 40px;
-			height: 40px;
+			width: 50px !important;
+			height: 50px !important;
 		}
 
 		.step-icon svg {
-			width: 24px;
+			width: 22px;
 		}
 
 		.step-title {
-			font-size: 20px;
+			font-size: 18px;
 		}
 		.step-description {
 			display: none;

@@ -209,10 +209,10 @@
 		<div class="centered-links">
 			<!-- svelte-ignore event_directive_deprecated -->
 			<!-- svelte-ignore a11y_invalid_attribute -->
-			<a href="#" on:click|preventDefault={showComingSoon}>Terms & Conditions</a> •
+			<a href="/terms">Terms & Conditions</a> •
 			<!-- svelte-ignore event_directive_deprecated -->
 			<!-- svelte-ignore a11y_invalid_attribute -->
-			<a href="#" on:click|preventDefault={showComingSoon}>Privacy Policy</a> •
+			<a href="/privacy">Privacy Policy</a> •
 			<span>All Rights Reserved</span>
 		</div>
 	</div>
