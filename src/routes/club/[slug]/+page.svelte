@@ -399,7 +399,7 @@
 										{#if mostFrequentClubDetails().selectivity === 'Open to all!'}
 											Open to all!
 										{:else if mostFrequentClubDetails().selectivity === 'Moderate'}
-											Moderate (&lt;50% acceptance)
+											Moderate (&lt;50%)
 										{:else if mostFrequentClubDetails().selectivity === 'High'}
 											High (&lt;20% acceptance)
 										{:else}
