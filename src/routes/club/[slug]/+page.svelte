@@ -689,6 +689,7 @@
 		height: 80px;
 		margin-right: 10px;
 		margin-top: 10px;
+		border-radius: 8px;
 	}
 
 	.club-header {

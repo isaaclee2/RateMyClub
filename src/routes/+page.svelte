@@ -19,7 +19,7 @@
 
 	<div class="content">
 		<h1 class="description">Rate and review clubs at USC</h1>
-
+		<!-- svelte-ignore event_directive_deprecated -->
 		<button class="search-link" on:click={goToAllClubs}>
 			<span class="search-text">Search for your club</span>
 			<svg
@@ -41,6 +41,52 @@
 			<a href="/all-clubs">Browse all clubs</a>
 		</div>
 	</div>
+</div>
+
+{#if data.popularClubs && data.popularClubs.length > 0}
+	<div class="popular-clubs">
+		<div class="popular-clubs-container">
+			<h2 class="popular-clubs-title">Popular Clubs</h2>
+			<p class="popular-clubs-subtitle">Most reviewed clubs at USC</p>
+
+			<div class="clubs-grid">
+				{#each data.popularClubs as club}
+					<a href="/club/{club.slug}" class="club-card">
+						<div class="club-image">
+							<img src={club.image} alt="{club.name} logo" />
+						</div>
+						<div class="club-info">
+							<h3 class="club-name">{club.name}</h3>
+							<div class="club-rating">
+								<div class="stars">
+									{#each Array(5) as _, i}
+										<span
+											class="star {i < Math.floor(club.overall_rating || 0) ? 'filled' : 'empty'}"
+											>★</span
+										>
+									{/each}
+								</div>
+								<span class="rating-text">({club.overall_rating || 0})</span>
+							</div>
+							{#if club.review_count == 1}
+								<div class="review-count">{club.review_count || 0} review</div>
+							{:else}
+								<div class="review-count">{club.review_count || 0} reviews</div>
+							{/if}
+						</div>
+					</a>
+				{/each}
+			</div>
+
+			<div class="view-all-container">
+				<a href="/all-clubs" class="view-all-btn">View All Clubs</a>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<div class="line">
+	<hr class="hr" />
 </div>
 
 <!-- How It Works Section -->
@@ -266,11 +312,6 @@
 		transition: all 0.3s ease;
 	}
 
-	.step-icon:hover {
-		transform: translateY(-4px);
-		box-shadow: 0 8px 30px rgba(194, 24, 7, 0.2);
-	}
-
 	.step-title {
 		font-size: 24px;
 		font-weight: 700;
@@ -283,6 +324,308 @@
 		color: #666;
 		line-height: 1.5;
 		margin: 0;
+	}
+	.line {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		margin-top: 0px;
+	}
+	.hr {
+		margin-top: 10px;
+		width: 90%;
+		text-align: center;
+	}
+	/* Popular Clubs Section */
+	.popular-clubs {
+		background-color: white;
+		padding: 60px 0;
+		font-family: 'Mulish', sans-serif;
+	}
+
+	.popular-clubs-container {
+		max-width: 90%;
+		margin: 0 auto;
+		padding: 0 20px;
+	}
+
+	.popular-clubs-title {
+		font-size: 36px;
+		font-weight: 700;
+		text-align: center;
+		color: #333;
+		margin-bottom: 10px;
+	}
+
+	.popular-clubs-subtitle {
+		font-size: 18px;
+		text-align: center;
+		color: #666;
+		margin-bottom: 40px;
+	}
+
+	.clubs-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: 20px;
+		margin-bottom: 40px;
+		justify-items: center;
+	}
+
+	.club-card {
+		background: white;
+		border-radius: 12px;
+		padding: 20px;
+		text-decoration: none;
+		color: inherit;
+		box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+		transition: all 0.3s ease;
+		border: 1px solid #eee;
+		width: 100%;
+		max-width: 250px;
+		aspect-ratio: 1; /* Always square */
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+	}
+
+	.club-card:hover {
+		transform: translateY(-5px);
+		box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+	}
+
+	.club-image {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 0px;
+		flex-shrink: 0;
+	}
+
+	.club-image img {
+		width: 50px;
+		height: 50px;
+		object-fit: contain;
+		border-radius: 8px;
+		margin-top: 15px;
+	}
+
+	.club-info {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		text-align: center;
+		flex-grow: 1;
+		width: 100%;
+	}
+
+	.club-name {
+		font-size: 18px;
+		font-weight: 700;
+		color: #333;
+		margin-bottom: 12px;
+		line-height: 1.2;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		width: 100%;
+	}
+
+	.club-rating {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		margin-bottom: 8px;
+		flex-wrap: wrap;
+	}
+
+	.stars {
+		color: #ffa534;
+		font-size: 16px;
+		line-height: 1;
+	}
+
+	.star.filled {
+		color: #ffa534;
+	}
+
+	.star.empty {
+		color: #d3d3d3;
+	}
+
+	.rating-text {
+		font-size: 13px;
+		color: #666;
+		font-weight: 600;
+	}
+
+	.review-count {
+		font-size: 13px;
+		color: #666;
+		margin-bottom: 0;
+		line-height: 1;
+	}
+
+	.view-all-container {
+		text-align: center;
+	}
+
+	.view-all-btn {
+		display: inline-block;
+		background-color: #c21807;
+		color: white;
+		padding: 12px 30px;
+		border-radius: 8px;
+		text-decoration: none;
+		font-weight: 600;
+		font-size: 16px;
+		transition: all 0.3s ease;
+	}
+
+	.view-all-btn:hover {
+		background-color: #b11800;
+		box-shadow: 0 4px 15px rgba(194, 24, 7, 0.3);
+	}
+
+	/* Tablet/Desktop - larger squares */
+	@media (min-width: 769px) {
+		.clubs-grid {
+			grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+			gap: 25px;
+		}
+
+		.club-card {
+			max-width: 280px;
+			padding: 25px;
+		}
+
+		.club-image img {
+			width: 60px;
+			height: 60px;
+		}
+
+		.club-name {
+			font-size: 20px;
+			margin-bottom: 15px;
+		}
+
+		.rating-text {
+			font-size: 14px;
+		}
+
+		.review-count {
+			font-size: 14px;
+		}
+
+		.stars {
+			font-size: 18px;
+		}
+	}
+
+	/* Medium screens - medium squares */
+	@media (max-width: 768px) and (min-width: 481px) {
+		.popular-clubs-title {
+			font-size: 28px;
+		}
+
+		.popular-clubs-subtitle {
+			font-size: 16px;
+		}
+
+		.clubs-grid {
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 20px;
+		}
+
+		.club-card {
+			max-width: 220px;
+			padding: 18px;
+		}
+
+		.club-image img {
+			width: 45px;
+			height: 45px;
+		}
+
+		.club-name {
+			font-size: 16px;
+			margin-bottom: 10px;
+		}
+
+		.rating-text {
+			font-size: 12px;
+		}
+
+		.review-count {
+			font-size: 12px;
+		}
+
+		.stars {
+			font-size: 15px;
+		}
+	}
+
+	/* Small screens - compact squares */
+	@media (max-width: 480px) {
+		.popular-clubs {
+			padding: 40px 0;
+		}
+
+		.popular-clubs-title {
+			font-size: 24px;
+		}
+
+		.popular-clubs-subtitle {
+			font-size: 14px;
+		}
+
+		.clubs-grid {
+			grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+			gap: 15px;
+		}
+
+		.club-card {
+			max-width: 160px;
+			padding: 15px;
+		}
+
+		.club-image {
+			margin-bottom: 8px;
+		}
+
+		.club-image img {
+			width: 35px;
+			height: 35px;
+		}
+
+		.club-name {
+			font-size: 13px;
+			margin-bottom: 8px;
+			line-height: 1.1;
+		}
+
+		.club-rating {
+			gap: 5px;
+			margin-bottom: 6px;
+		}
+
+		.rating-text {
+			font-size: 10px;
+		}
+
+		.review-count {
+			font-size: 10px;
+		}
+
+		.stars {
+			font-size: 12px;
+		}
 	}
 
 	/* Mobile Responsive */

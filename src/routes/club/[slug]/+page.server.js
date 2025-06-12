@@ -19,9 +19,6 @@ export async function load({ params }) {
         };
     }
 
-    console.log("Club data:", clubData);
-    console.log("Club ID:", clubData.id);
-
     const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')
@@ -31,9 +28,6 @@ export async function load({ params }) {
     if (reviewsError) {
         console.error("Error fetching reviews:", reviewsError);
     }
-
-    console.log("Reviews data:", reviewsData);
-    console.log("Number of reviews:", reviewsData?.length || 0);
 
     return {
         club: clubData,
