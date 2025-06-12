@@ -401,7 +401,7 @@
 										{:else if mostFrequentClubDetails().selectivity === 'Moderate'}
 											Moderate (&lt;50%)
 										{:else if mostFrequentClubDetails().selectivity === 'High'}
-											High (&lt;20% acceptance)
+											High (&lt;20%)
 										{:else}
 											{mostFrequentClubDetails().selectivity}
 										{/if}
