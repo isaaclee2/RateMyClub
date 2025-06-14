@@ -2,7 +2,6 @@
 </script>
 
 <div class="terms-container">
-	TESTINGTESTING
 	<div class="terms-content">
 		<h1 class="terms-title">Terms and Conditions</h1>
 		<div class="terms-section">
