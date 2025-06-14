@@ -61,7 +61,7 @@
 								<div class="stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(club.overall_rating || 0) ? 'filled' : 'empty'}"
+											class="star {i < Math.round(club.overall_rating || 0) ? 'filled' : 'empty'}"
 											>★</span
 										>
 									{/each}

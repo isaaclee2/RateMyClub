@@ -3,7 +3,6 @@
 	let { children, data } = $props();
 	const user = $derived(data.session?.user);
 
-	// Form state
 	let formData = $state({
 		name: '',
 		email: '',
@@ -23,17 +22,14 @@
 		submitError = '';
 
 		try {
-			// Validate required fields
 			if (!formData.name || !formData.email || !formData.year || !formData.proofOfMembership) {
 				throw new Error('Please fill in all required personal information fields');
 			}
 
-			// Check if any updates are provided
 			if (!formData.mission && !formData.categories && !formData.website) {
 				throw new Error('Please provide at least one update.');
 			}
 
-			// Insert the update request
 			const { error: insertError } = await supabase.from('pending_club_updates').insert({
 				club_id: data.club.id,
 				club_slug: data.club.slug,
@@ -89,8 +85,8 @@
 				</svg>
 				Back to {data.club.name}
 			</a>
-			<h1>Update Club Information</h1>
-			<p class="subtitle">Submit updates for <strong>{data.club.name}</strong></p>
+			<h1>Update Club Information Request</h1>
+			<p class="subtitle">Submit update requests for <strong>{data.club.name}</strong></p>
 		</div>
 
 		<form on:submit={handleSubmit} class="update-form">
@@ -348,7 +344,7 @@
 	}
 
 	.current-field strong {
-		color: #495057;
+		color: #c21807;
 		display: inline-block;
 		min-width: 80px;
 	}

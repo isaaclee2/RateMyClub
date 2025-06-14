@@ -85,7 +85,7 @@
 			<div class="overall-rating-container">
 				<h1 class="overall-rating">
 					{#each Array(5) as _, i}
-						<span class="star {i < Math.floor(data.club.overall_rating || 0) ? 'filled' : 'empty'}"
+						<span class="star {i < Math.round(data.club.overall_rating || 0) ? 'filled' : 'empty'}"
 							>★</span
 						>
 					{/each}
@@ -143,7 +143,7 @@
 								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
 								<path d="m18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
 							</svg>
-							Update club information
+							Request Club Info Update
 						</a>
 					{:else}
 						<button onclick={openSignInPopup} class="update-info-button">
@@ -196,11 +196,12 @@
 								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(data.club.leadership_rating || 0)
+											class="star {i < Math.round(data.club.leadership_rating || 0)
 												? 'filled'
 												: 'empty'}">★</span
 										>
 									{/each}
+									<div class="sub-rating">({(data.club.leadership_rating || 0).toFixed(1)})</div>
 								</div>
 							</div>
 
@@ -227,11 +228,12 @@
 								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(data.club.inclusivity_rating || 0)
+											class="star {i < Math.round(data.club.inclusivity_rating || 0)
 												? 'filled'
 												: 'empty'}">★</span
 										>
 									{/each}
+									<div class="sub-rating">({(data.club.inclusivity_rating || 0).toFixed(1)})</div>
 								</div>
 							</div>
 
@@ -256,11 +258,12 @@
 								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(data.club.development_rating || 0)
+											class="star {i < Math.round(data.club.development_rating || 0)
 												? 'filled'
 												: 'empty'}">★</span
 										>
 									{/each}
+									<div class="sub-rating">({(data.club.development_rating || 0).toFixed(1)})</div>
 								</div>
 							</div>
 
@@ -287,11 +290,12 @@
 								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(data.club.social_rating || 0)
+											class="star {i < Math.round(data.club.social_rating || 0)
 												? 'filled'
 												: 'empty'}">★</span
 										>
 									{/each}
+									<div class="sub-rating">({(data.club.social_rating || 0).toFixed(1)})</div>
 								</div>
 							</div>
 
@@ -364,11 +368,12 @@
 								<div class="rating-stars">
 									{#each Array(5) as _, i}
 										<span
-											class="star {i < Math.floor(data.club.overall_vibes_rating || 0)
+											class="star {i < Math.round(data.club.overall_vibes_rating || 0)
 												? 'filled'
 												: 'empty'}">★</span
 										>
 									{/each}
+									<div class="sub-rating">({(data.club.overall_vibes_rating || 0).toFixed(1)})</div>
 								</div>
 							</div>
 						</div>
@@ -527,7 +532,7 @@
 								<div class="review-rating">
 									<div class="stars">
 										{#each Array(5) as _, i}
-											<span class="star {i < Math.floor(avgRating) ? 'filled' : 'empty'}">★</span>
+											<span class="star {i < Math.round(avgRating) ? 'filled' : 'empty'}">★</span>
 										{/each}
 									</div>
 									<div class="rating-text">{avgRating.toFixed(1)}/5</div>
@@ -955,6 +960,14 @@
 	.rating-stars {
 		color: #ffa534;
 		font-size: 17px;
+		display: flex;
+		flex-direction: row;
+	}
+	.sub-rating {
+		font-size: 15px;
+		padding: 1.5px;
+		margin-left: 5px;
+		margin-right: -10px;
 	}
 
 	svg {
