@@ -298,20 +298,66 @@
 							<div class="rating-item">
 								<div class="criteria-label">
 									<svg
-										class="breakdown-svg"
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 24 24"
-										fill="none"
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-linejoin="round"
+										id="Mail_Smiley_Happy_Face_24"
 										width="24"
 										height="24"
-										stroke-width="2"
-									>
-										<path
-											d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-										/>
+										viewBox="0 0 24 24"
+										xmlns="http://www.w3.org/2000/svg"
+										xmlns:xlink="http://www.w3.org/1999/xlink"
+										><rect width="24" height="24" stroke="none" fill="#000000" opacity="0" />
+
+										<g transform="matrix(1.43 0 0 1.43 12 12)">
+											<g style="">
+												<g transform="matrix(1 0 0 1 0 0)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-7, -7)"
+														d="M 7 13.5 C 10.5899 13.5 13.5 10.5899 13.5 7 C 13.5 3.41015 10.5899 0.5 7 0.5 C 3.41015 0.5 0.5 3.41015 0.5 7 C 0.5 10.5899 3.41015 13.5 7 13.5 Z"
+														stroke-linecap="round"
+													/>
+												</g>
+												<g transform="matrix(1 0 0 1 0 2.26)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-7, -9.26)"
+														d="M 3.7 8 C 4.2 9.8 6.2 10.9 8 10.4 C 9.1 10 10 9.1 10.3 8"
+														stroke-linecap="round"
+													/>
+												</g>
+												<g transform="matrix(1 0 0 1 -2.33 -1.8)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-4.67, -5.2)"
+														d="M 4.8 5.45 C 4.66193 5.45 4.55 5.33807 4.55 5.2 C 4.55 5.06193 4.66193 4.95 4.8 4.95"
+														stroke-linecap="round"
+													/>
+												</g>
+												<g transform="matrix(1 0 0 1 -2.08 -1.8)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-4.92, -5.2)"
+														d="M 4.8 5.45 C 4.93807 5.45 5.05 5.33807 5.05 5.2 C 5.05 5.06193 4.93807 4.95 4.8 4.95"
+														stroke-linecap="round"
+													/>
+												</g>
+												<g transform="matrix(1 0 0 1 2.07 -1.8)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-9.07, -5.2)"
+														d="M 9.2 5.45 C 9.06193 5.45 8.95 5.33807 8.95 5.2 C 8.95 5.06193 9.06193 4.95 9.2 4.95"
+														stroke-linecap="round"
+													/>
+												</g>
+												<g transform="matrix(1 0 0 1 2.32 -1.8)">
+													<path
+														style="stroke: rgb(0,0,0); stroke-width: 1; stroke-dasharray: none; stroke-linecap: round; stroke-dashoffset: 0; stroke-linejoin: round; stroke-miterlimit: 4; fill: none; fill-rule: nonzero; opacity: 1;"
+														transform=" translate(-9.32, -5.2)"
+														d="M 9.2 5.45 C 9.33807 5.45 9.45 5.33807 9.45 5.2 C 9.45 5.06193 9.33807 4.95 9.2 4.95"
+														stroke-linecap="round"
+													/>
+												</g>
+											</g>
+										</g>
 									</svg>
 									Overall Vibes
 								</div>
