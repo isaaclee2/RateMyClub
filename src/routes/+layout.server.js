@@ -5,4 +5,4 @@ export const load = async ({ locals: { safeGetSession } }) => {
         session,
         user,
     }
-}
+} 

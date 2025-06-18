@@ -13,14 +13,14 @@
 			console.log('Client session set successfully');
 		}
 	});
-	let showReviewForm = false; //default false
+	let showReviewForm = false;
 	let reviewFormRef;
 
 	let connection = '';
 	let year = '';
 
 	let reviewFormRef2;
-	let showReview2 = false; // default false
+	let showReview2 = false;
 
 	let leadershipRating = 0;
 	let inclusivityRating = 0;
@@ -28,13 +28,13 @@
 	let socialRating = 0;
 	let overallVibes = 0;
 
-	let showReview3 = false; // default false
+	let showReview3 = false;
 	let reviewFormRef3;
 
 	let membersOneToFour = 0;
 	let selectivityOneToFour = 0;
 
-	let showReview4 = false; // default false
+	let showReview4 = false;
 	let reviewFormRef4;
 
 	let reviewText = '';

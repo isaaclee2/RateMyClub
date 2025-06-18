@@ -37,7 +37,7 @@ function checkRateLimit(ip) {
 function isValidReturnPath(path) {
     // Only allow specific safe paths
     const allowedPaths = [
-        '/', '/all-clubs', '/about', '/contact',
+        '/', '/all-clubs', '/about', '/contact', '/admin'
         // Add other safe paths here
     ];
 
@@ -59,28 +59,38 @@ export const actions = {
             });
         }
 
-        // Log auth attempt
-        console.log(`OAuth attempt from IP: ${ip} at ${new Date()}`);
+        // Check for next parameter in URL first, then fallback to referrer
+        let returnPath = url.searchParams.get('next') || '/all-clubs';
 
-        const referrer = request.headers.get('referer');
-        let returnPath = '/all-clubs'; // Safe default
+        // If no next param, check referrer
+        if (!url.searchParams.get('next')) {
+            const referrer = request.headers.get('referer');
+            if (referrer) {
+                try {
+                    const referrerUrl = new URL(referrer);
+                    if (referrerUrl.origin === url.origin) {
+                        const requestedPath = referrerUrl.pathname + referrerUrl.search;
 
-        if (referrer) {
-            try {
-                const referrerUrl = new URL(referrer);
-                if (referrerUrl.origin === url.origin) {
-                    const requestedPath = referrerUrl.pathname + referrerUrl.search;
-
-                    // Validate the return path for security
-                    if (isValidReturnPath(referrerUrl.pathname)) {
-                        returnPath = requestedPath;
-                    } else {
-                        console.log(`Blocked invalid return path: ${requestedPath} from IP: ${ip}`);
-                        // Use safe default instead
+                        // Validate the return path for security
+                        if (isValidReturnPath(referrerUrl.pathname)) {
+                            returnPath = requestedPath;
+                        }
                     }
+                } catch (e) {
+                    console.log(`Invalid referrer URL from IP: ${ip}:`, e.message);
+                }
+            }
+        }
+
+        // Validate the next parameter too
+        if (url.searchParams.get('next')) {
+            try {
+                const nextUrl = new URL(url.searchParams.get('next'), url.origin);
+                if (!isValidReturnPath(nextUrl.pathname)) {
+                    returnPath = '/all-clubs'; // Safe fallback
                 }
             } catch (e) {
-                console.log(`Invalid referrer URL from IP: ${ip}:`, e.message);
+                returnPath = '/all-clubs'; // Safe fallback
             }
         }
 
@@ -91,7 +101,7 @@ export const actions = {
                 queryParams: {
                     access_type: 'offline',
                     prompt: 'consent',
-                    hd: 'usc.edu' // Enforce USC domain
+                    hd: 'usc.edu'
                 }
             }
         });

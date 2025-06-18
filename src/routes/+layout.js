@@ -6,11 +6,6 @@ import { browser } from '$app/environment'
 export const load = async ({ fetch, data, depends, url }) => {
     depends('supabase:auth')
 
-    // Don't create Supabase client for admin routes
-    if (url.pathname.startsWith('/admin')) {
-        return { supabase: null, session: null }
-    }
-
     const supabase = createSupabaseLoadClient({
         supabaseUrl: PUBLIC_SUPABASE_URL,
         supabaseKey: PUBLIC_SUPABASE_ANON_KEY,

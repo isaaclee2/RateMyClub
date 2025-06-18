@@ -1,11 +1,8 @@
-// admin +page.server.js
-
-import { redirect, fail } from '@sveltejs/kit';
-import { ADMIN_SECRET_KEY, ADMIN_EMAILS, SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
+// src/routes/admin/+page.server.js
+import { fail } from '@sveltejs/kit';
+import { SUPABASE_SERVICE_ROLE_KEY, ADMIN_EMAILS } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { createClient } from '@supabase/supabase-js';
-import jwt from 'jsonwebtoken';
-const revokedTokens = new Set();
 
 // Create Supabase client with service role key for server-side operations
 const supabase = createClient(
@@ -13,46 +10,38 @@ const supabase = createClient(
     SUPABASE_SERVICE_ROLE_KEY
 );
 
-function isAdminEmail(email) {
-    const adminEmails = ADMIN_EMAILS.split(',').map(e => e.trim().toLowerCase());
-    return adminEmails.includes(email.toLowerCase());
-}
-
-async function verifyAdminToken(cookies) {
-    const adminToken = cookies.get('admin_token');
-
-    if (!adminToken || revokedTokens.has(adminToken)) {
-        throw redirect(302, '/admin/login');
-    }
-
+// Helper function to validate admin access (for actions)
+async function validateAdminAccess(locals) {
     try {
-        const decoded = jwt.verify(adminToken, ADMIN_SECRET_KEY);
+        const { data: { user }, error } = await locals.supabase.auth.getUser();
 
-        if (!decoded.email || !isAdminEmail(decoded.email)) {
-            throw redirect(302, '/admin/login');
+        if (error || !user) {
+            console.log('No authenticated user found');
+            return null;
         }
 
-        return decoded;
-    } catch (err) {
-        console.error('Token verification failed:', err.name);
-        throw redirect(302, '/admin/login');
+        const adminEmails = ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase());
+        console.log('Admin emails from env:', adminEmails);
+        console.log('User email:', user.email);
+
+        if (!adminEmails.includes(user.email.toLowerCase())) {
+            console.log('User is not an admin');
+            return null;
+        }
+
+        console.log('Admin access granted!');
+        return user;
+    } catch (error) {
+        console.error('Error validating admin access:', error);
+        return null;
     }
 }
 
-export async function load({ cookies }) {
+export async function load({ parent }) {
+    const { adminUser } = await parent();
 
     try {
-        const decoded = await verifyAdminToken(cookies);
-        console.log('Token verified successfully for:', decoded.email);
-    } catch (error) {
-        console.log('Token verification failed, redirecting to login');
-        throw error; // This will be the redirect
-    }
-
-    try {
-        console.log('Attempting to connect to Supabase...');
-        console.log('Supabase client created with URL:', PUBLIC_SUPABASE_URL);
-        console.log('Supabase client created with key length:', SUPABASE_SERVICE_ROLE_KEY?.length);
+        console.log('Loading admin data for:', adminUser.email);
 
         // Load pending reviews
         const { data: pendingReviews, error: reviewError } = await supabase
@@ -69,6 +58,33 @@ export async function load({ cookies }) {
             console.error('Error loading pending reviews:', reviewError);
             return fail(500, { error: 'Failed to load pending reviews: ' + reviewError.message });
         }
+
+        // For each pending review, check if the user has already reviewed this club
+        const reviewsWithExistingCheck = await Promise.all(
+            (pendingReviews || []).map(async (review) => {
+                const { data: existingReviews, error: existingError } = await supabase
+                    .from('reviews')
+                    .select('id, created_at, approved_at')
+                    .eq('user_email', review.user_email)
+                    .eq('club_slug', review.club_slug);
+
+                if (existingError) {
+                    console.error('Error checking existing reviews:', existingError);
+                    return {
+                        ...review,
+                        hasExistingReview: false,
+                        existingReviewCount: 0
+                    };
+                }
+
+                return {
+                    ...review,
+                    hasExistingReview: existingReviews && existingReviews.length > 0,
+                    existingReviewCount: existingReviews ? existingReviews.length : 0,
+                    existingReviews: existingReviews || []
+                };
+            })
+        );
 
         // Load pending club updates
         const { data: pendingClubUpdates, error: updateError } = await supabase
@@ -87,12 +103,12 @@ export async function load({ cookies }) {
         }
 
         console.log('Successfully loaded admin data');
-        const decoded = await verifyAdminToken(cookies);
 
         return {
             authenticated: true,
-            adminEmail: decoded.email,
-            pendingReviews: pendingReviews || [],
+            adminEmail: adminUser.email,
+            session: { user: adminUser },
+            pendingReviews: reviewsWithExistingCheck || [],
             pendingClubUpdates: pendingClubUpdates || []
         };
     } catch (error) {
@@ -101,126 +117,180 @@ export async function load({ cookies }) {
     }
 }
 
-async function recalculateClubStats(clubId) {
+async function recalculateClubStats(clubSlug) {
     try {
-        const { data: reviews, error: reviewsError } = await supabase
+        console.log(`Recalculating stats for club: ${clubSlug}`);
+
+        // Get all approved reviews for this club
+        const { data: clubReviews, error: reviewsError } = await supabase
             .from('reviews')
             .select('leadership_rating, inclusivity_rating, development_rating, social_rating, overall_rating')
-            .eq('club_id', clubId);
+            .eq('club_slug', clubSlug);
 
-        if (reviewsError) throw reviewsError;
+        if (reviewsError) {
+            console.error('Error fetching club reviews:', reviewsError);
+            return false;
+        }
 
-        if (reviews.length === 0) return;
+        console.log(`Found ${clubReviews?.length || 0} reviews for club ${clubSlug}`);
+        console.log('Sample review data:', clubReviews?.[0]);
 
-        const totals = reviews.reduce(
-            (acc, review) => {
-                acc.leadership += review.leadership_rating;
-                acc.inclusivity += review.inclusivity_rating;
-                acc.development += review.development_rating;
-                acc.social += review.social_rating;
-                acc.overall += review.overall_rating;
-                return acc;
-            },
-            {
-                leadership: 0,
-                inclusivity: 0,
-                development: 0,
-                social: 0,
-                overall: 0
+        if (!clubReviews || clubReviews.length === 0) {
+            console.log('No reviews found for club, setting default stats');
+            // Set default values when no reviews exist
+            const { error: updateError } = await supabase
+                .from('clubs')
+                .update({
+                    leadership_rating: null,
+                    inclusivity_rating: null,
+                    development_rating: null,
+                    social_rating: null,
+                    overall_vibes_rating: null,
+                    overall_rating: 0.0,
+                    review_count: 0
+                })
+                .eq('slug', clubSlug);
+
+            if (updateError) {
+                console.error('Error updating club stats to defaults:', updateError);
+                return false;
             }
-        );
+            return true;
+        }
 
-        const count = reviews.length;
-        const averages = {
-            leadership_rating: Number((totals.leadership / count).toFixed(1)),
-            inclusivity_rating: Number((totals.inclusivity / count).toFixed(1)),
-            development_rating: Number((totals.development / count).toFixed(1)),
-            social_rating: Number((totals.social / count).toFixed(1)),
-            overall_vibes_rating: Number((totals.overall / count).toFixed(1))
+        // Calculate averages
+        const totalReviews = clubReviews.length;
+        const avgLeadership = clubReviews.reduce((sum, r) => sum + r.leadership_rating, 0) / totalReviews;
+        const avgInclusivity = clubReviews.reduce((sum, r) => sum + r.inclusivity_rating, 0) / totalReviews;
+        const avgDevelopment = clubReviews.reduce((sum, r) => sum + r.development_rating, 0) / totalReviews;
+        const avgSocial = clubReviews.reduce((sum, r) => sum + r.social_rating, 0) / totalReviews;
+        const avgOverall = clubReviews.reduce((sum, r) => sum + r.overall_rating, 0) / totalReviews;
+
+        console.log(`Calculated averages for ${clubSlug}:`, {
+            totalReviews,
+            avgLeadership: avgLeadership.toFixed(2),
+            avgInclusivity: avgInclusivity.toFixed(2),
+            avgDevelopment: avgDevelopment.toFixed(2),
+            avgSocial: avgSocial.toFixed(2),
+            avgOverall: avgOverall.toFixed(2)
+        });
+
+        // Update club stats with correct column names
+        const updateData = {
+            leadership_rating: Math.round(avgLeadership * 100) / 100,
+            inclusivity_rating: Math.round(avgInclusivity * 100) / 100,
+            development_rating: Math.round(avgDevelopment * 100) / 100,
+            social_rating: Math.round(avgSocial * 100) / 100,
+            overall_vibes_rating: Math.round(avgOverall * 100) / 100,
+            overall_rating: Math.round(avgOverall * 100) / 100,
+            review_count: totalReviews
         };
 
-        const overallRating = Number(
-            (
-                (averages.leadership_rating +
-                    averages.inclusivity_rating +
-                    averages.development_rating +
-                    averages.social_rating +
-                    averages.overall_vibes_rating) /
-                5
-            ).toFixed(1)
-        );
+        console.log(`Updating club ${clubSlug} with data:`, updateData);
 
-        const { error: updateError } = await supabase
+        const { data: updateResult, error: updateError } = await supabase
             .from('clubs')
-            .update({
-                leadership_rating: averages.leadership_rating,
-                inclusivity_rating: averages.inclusivity_rating,
-                development_rating: averages.development_rating,
-                social_rating: averages.social_rating,
-                overall_vibes_rating: averages.overall_vibes_rating,
-                overall_rating: overallRating,
-                review_count: count
-            })
-            .eq('id', clubId);
+            .update(updateData)
+            .eq('slug', clubSlug)
+            .select();
 
-        if (updateError) throw updateError;
+        if (updateError) {
+            console.error('Error updating club stats:', updateError);
+            return false;
+        }
+
+        console.log(`Successfully updated stats for ${clubSlug}:`, updateResult);
+        return true;
     } catch (error) {
-        console.error('Error recalculating club stats:', error);
-        throw error;
+        console.error('Error in recalculateClubStats:', error);
+        return false;
     }
 }
 
 export const actions = {
-    approveReview: async ({ request, cookies }) => {
-        const decoded = await verifyAdminToken(cookies);
-        try {
-            const data = await request.formData();
-            const reviewId = data.get('reviewId');
+    logout: async ({ locals }) => {
+        console.log('Admin logout action called');
 
-            console.log(`[AUDIT] ${decoded.email} approved review ${reviewId} at ${new Date()}`);
+        const { error } = await locals.supabase.auth.signOut();
+        if (error) {
+            console.error('Logout error:', error);
+            return fail(500, { error: 'Failed to logout' });
+        }
+
+        console.log('Admin logout successful');
+        return { message: 'Logged out successfully' };
+    },
+
+    approveReview: async ({ request, locals }) => {
+        console.log('Approve review action called');
+
+        // Validate admin access
+        const adminUser = await validateAdminAccess(locals);
+        if (!adminUser) {
+            console.log('Unauthorized approve review attempt');
+            return fail(403, { error: 'Unauthorized' });
+        }
+
+        try {
+            const formData = await request.formData();
+            const reviewId = formData.get('reviewId');
 
             if (!reviewId) {
                 return fail(400, { error: 'Review ID is required' });
             }
 
+            console.log(`Admin ${adminUser.email} approving review ${reviewId}`);
+
             // Get the pending review
-            const { data: review, error: fetchError } = await supabase
+            const { data: pendingReview, error: fetchError } = await supabase
                 .from('pending_reviews')
                 .select('*')
                 .eq('id', reviewId)
                 .single();
 
-            if (fetchError) {
+            if (fetchError || !pendingReview) {
                 console.error('Error fetching pending review:', fetchError);
-                return fail(500, { error: 'Failed to fetch pending review' });
+                return fail(404, { error: 'Review not found' });
             }
 
-            // Insert into reviews table
-            const { error: insertError } = await supabase.from('reviews').insert([
-                {
-                    club_id: review.club_id,
-                    club_slug: review.club_slug,
-                    user_email: review.user_email,
-                    connection: review.connection,
-                    year_joined: review.year_joined,
-                    leadership_rating: review.leadership_rating,
-                    inclusivity_rating: review.inclusivity_rating,
-                    development_rating: review.development_rating,
-                    social_rating: review.social_rating,
-                    overall_rating: review.overall_rating,
-                    members_estimate: review.members_estimate,
-                    selectivity_estimate: review.selectivity_estimate,
-                    review_text: review.review_text,
-                    approved_at: new Date().toISOString()
-                }
-            ]);
+            // Get the club ID from the slug
+            const { data: club, error: clubError } = await supabase
+                .from('clubs')
+                .select('id')
+                .eq('slug', pendingReview.club_slug)
+                .single();
+
+            if (clubError || !club) {
+                console.error('Error fetching club:', clubError);
+                return fail(404, { error: 'Club not found' });
+            }
+
+            // Move to approved reviews table
+            const { error: insertError } = await supabase
+                .from('reviews')
+                .insert({
+                    user_email: pendingReview.user_email,
+                    club_id: club.id,
+                    club_slug: pendingReview.club_slug,
+                    leadership_rating: pendingReview.leadership_rating,
+                    inclusivity_rating: pendingReview.inclusivity_rating,
+                    development_rating: pendingReview.development_rating,
+                    social_rating: pendingReview.social_rating,
+                    overall_rating: pendingReview.overall_rating,
+                    review_text: pendingReview.review_text,
+                    connection: pendingReview.connection,
+                    year_joined: pendingReview.year_joined,
+                    members_estimate: pendingReview.members_estimate,
+                    selectivity_estimate: pendingReview.selectivity_estimate,
+                    created_at: pendingReview.created_at
+                });
 
             if (insertError) {
                 console.error('Error inserting approved review:', insertError);
-                return fail(500, { error: 'Failed to approve review' });
+                return fail(500, { error: 'Failed to approve review: ' + insertError.message });
             }
 
-            // Delete from pending_reviews
+            // Remove from pending reviews
             const { error: deleteError } = await supabase
                 .from('pending_reviews')
                 .delete()
@@ -228,113 +298,144 @@ export const actions = {
 
             if (deleteError) {
                 console.error('Error deleting pending review:', deleteError);
-                return fail(500, { error: 'Failed to remove pending review' });
+                return fail(500, { error: 'Failed to remove pending review: ' + deleteError.message });
             }
 
             // Recalculate club stats
-            await recalculateClubStats(review.club_id);
+            console.log(`About to recalculate stats for club: ${pendingReview.club_slug}`);
+            const statsUpdated = await recalculateClubStats(pendingReview.club_slug);
+            if (!statsUpdated) {
+                console.warn('Failed to update club stats, but review was approved');
+            } else {
+                console.log('Club stats updated successfully');
+            }
 
-            return { success: true, message: 'Review approved successfully!' };
+            console.log(`Review ${reviewId} approved successfully by ${adminUser.email}`);
+            return { message: 'Review approved successfully!' };
+
         } catch (error) {
             console.error('Error in approveReview action:', error);
-            return fail(500, { error: 'Failed to approve review' });
+            return fail(500, { error: 'Failed to approve review: ' + error.message });
         }
     },
 
-    rejectReview: async ({ request, cookies }) => {
-        const decoded = await verifyAdminToken(cookies);
+    rejectReview: async ({ request, locals }) => {
+        console.log('Reject review action called');
 
+        // Validate admin access
+        const adminUser = await validateAdminAccess(locals);
+        if (!adminUser) {
+            console.log('Unauthorized reject review attempt');
+            return fail(403, { error: 'Unauthorized' });
+        }
 
         try {
-            const data = await request.formData();
-            const reviewId = data.get('reviewId');
-            console.log(`[AUDIT] ${decoded.email} rejected review ${reviewId} at ${new Date()}`);
+            const formData = await request.formData();
+            const reviewId = formData.get('reviewId');
 
             if (!reviewId) {
                 return fail(400, { error: 'Review ID is required' });
             }
 
-            const { error } = await supabase
+            console.log(`Admin ${adminUser.email} rejecting review ${reviewId}`);
+
+            // Delete the pending review
+            const { error: deleteError } = await supabase
                 .from('pending_reviews')
                 .delete()
                 .eq('id', reviewId);
 
-            if (error) {
-                console.error('Error rejecting review:', error);
-                return fail(500, { error: 'Failed to reject review' });
+            if (deleteError) {
+                console.error('Error deleting pending review:', deleteError);
+                return fail(500, { error: 'Failed to reject review: ' + deleteError.message });
             }
 
-            return { success: true, message: 'Review rejected and deleted.' };
+            console.log(`Review ${reviewId} rejected successfully by ${adminUser.email}`);
+            return { message: 'Review rejected successfully!' };
+
         } catch (error) {
             console.error('Error in rejectReview action:', error);
-            return fail(500, { error: 'Failed to reject review' });
+            return fail(500, { error: 'Failed to reject review: ' + error.message });
         }
     },
 
-    confirmClubUpdate: async ({ request, cookies }) => {
-        const decoded = await verifyAdminToken(cookies);
+    confirmClubUpdate: async ({ request, locals }) => {
+        console.log('Confirm club update action called');
+
+        // Validate admin access
+        const adminUser = await validateAdminAccess(locals);
+        if (!adminUser) {
+            console.log('Unauthorized club update attempt');
+            return fail(403, { error: 'Unauthorized' });
+        }
 
         try {
-            const data = await request.formData();
-            const updateId = data.get('updateId');
-            console.log(`[AUDIT] ${decoded.email} confirmed club update ${updateId} at ${new Date()}`);
+            const formData = await request.formData();
+            const updateId = formData.get('updateId');
 
             if (!updateId) {
                 return fail(400, { error: 'Update ID is required' });
             }
 
-            const { error } = await supabase
+            console.log(`Admin ${adminUser.email} confirming club update ${updateId}`);
+
+            // Delete the pending club update
+            const { error: deleteError } = await supabase
                 .from('pending_club_updates')
                 .delete()
                 .eq('id', updateId);
 
-            if (error) {
-                console.error('Error confirming club update:', error);
-                return fail(500, { error: 'Failed to confirm club update' });
+            if (deleteError) {
+                console.error('Error deleting pending club update:', deleteError);
+                return fail(500, { error: 'Failed to confirm club update: ' + deleteError.message });
             }
 
-            return { success: true, message: 'Club update request marked as complete!' };
+            console.log(`Club update ${updateId} confirmed successfully by ${adminUser.email}`);
+            return { message: 'Club update confirmed successfully!' };
+
         } catch (error) {
             console.error('Error in confirmClubUpdate action:', error);
-            return fail(500, { error: 'Failed to confirm club update' });
+            return fail(500, { error: 'Failed to confirm club update: ' + error.message });
         }
     },
 
-    rejectClubUpdate: async ({ request, cookies }) => {
-        const decoded = await verifyAdminToken(cookies);
+    rejectClubUpdate: async ({ request, locals }) => {
+        console.log('Reject club update action called');
+
+        // Validate admin access
+        const adminUser = await validateAdminAccess(locals);
+        if (!adminUser) {
+            console.log('Unauthorized reject club update attempt');
+            return fail(403, { error: 'Unauthorized' });
+        }
+
         try {
-            const data = await request.formData();
-            const updateId = data.get('updateId');
-            console.log(`[AUDIT] ${decoded.email} rejected club update ${updateId} at ${new Date()}`);
+            const formData = await request.formData();
+            const updateId = formData.get('updateId');
 
             if (!updateId) {
                 return fail(400, { error: 'Update ID is required' });
             }
 
-            const { error } = await supabase
+            console.log(`Admin ${adminUser.email} rejecting club update ${updateId}`);
+
+            // Delete the pending club update
+            const { error: deleteError } = await supabase
                 .from('pending_club_updates')
                 .delete()
                 .eq('id', updateId);
 
-            if (error) {
-                console.error('Error rejecting club update:', error);
-                return fail(500, { error: 'Failed to reject club update' });
+            if (deleteError) {
+                console.error('Error deleting pending club update:', deleteError);
+                return fail(500, { error: 'Failed to reject club update: ' + deleteError.message });
             }
 
-            return { success: true, message: 'Club update request rejected and deleted.' };
+            console.log(`Club update ${updateId} rejected successfully by ${adminUser.email}`);
+            return { message: 'Club update rejected successfully!' };
+
         } catch (error) {
             console.error('Error in rejectClubUpdate action:', error);
-            return fail(500, { error: 'Failed to reject club update' });
+            return fail(500, { error: 'Failed to reject club update: ' + error.message });
         }
-    },
-
-    logout: async ({ cookies }) => {
-        const token = cookies.get('admin_token');
-        if (token) {
-            revokedTokens.add(token);
-            console.log(`[AUDIT] Admin logged out and token revoked at ${new Date()}`);
-        }
-        cookies.delete('admin_token', { path: '/' });
-        throw redirect(302, '/admin/login');
     }
 };

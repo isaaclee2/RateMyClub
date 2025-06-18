@@ -32,33 +32,33 @@
 	// Enhanced form submission with loading states (only runs on client)
 	// Enhanced form submission with loading states (only runs on client)
 	function enhancedSubmit() {
-		if (!browser) return enhance; // Return the function, don't call it
+		if (!browser) return enhance;
 
-		return enhance(async ({ formElement }) => {
-			// Add loading state to the button
+		return enhance(async ({ formElement, action }) => {
 			const button = formElement.querySelector('button[type="submit"]');
 			const originalText = button.textContent;
 			button.disabled = true;
 			button.textContent = 'Processing...';
 
 			return async ({ result, update }) => {
-				// Re-enable button
 				button.disabled = false;
 				button.textContent = originalText;
 
+				// Handle logout action specifically
+				if (action.search === '?/logout' && result.type === 'success') {
+					// Logout successful - the auth state change will handle the redirect
+					await invalidateAll();
+					return;
+				}
+
 				if (result.type === 'success') {
-					// Show success message
 					if (result.data?.message) {
 						alert(result.data.message);
 					}
-					// Refresh the page data
 					await invalidateAll();
 				} else if (result.type === 'failure') {
-					// Show error message
 					alert(result.data?.error || 'An error occurred');
 				}
-
-				// Don't call update() to prevent form reset
 			};
 		});
 	}
@@ -147,6 +147,32 @@
 								<span class="connection">{review.connection} • {review.year_joined}</span>
 							</div>
 						</div>
+
+						{#if review.hasExistingReview}
+							<div class="existing-review-warning">
+								<div class="warning-header">
+									<span class="warning-icon">⚠️</span>
+									<span class="warning-text">
+										<strong>Duplicate Review Alert:</strong>
+										This user has already submitted {review.existingReviewCount} review{review.existingReviewCount >
+										1
+											? 's'
+											: ''} for this club.
+									</span>
+								</div>
+								<div class="existing-reviews-list">
+									{#each review.existingReviews as existingReview}
+										<div class="existing-review-item">
+											<span class="existing-review-date">
+												Reviewed: {formatDate(
+													existingReview.approved_at || existingReview.created_at
+												)}
+											</span>
+										</div>
+									{/each}
+								</div>
+							</div>
+						{/if}
 
 						<div class="ratings-grid">
 							<div class="rating-item">
@@ -491,6 +517,47 @@
 	.connection {
 		font-size: 12px;
 		color: #666;
+	}
+	.existing-review-warning {
+		margin-bottom: 20px;
+		padding: 15px;
+		background-color: #fff3cd;
+		border: 1px solid #ffeaa7;
+		border-radius: 8px;
+		border-left: 4px solid #f39c12;
+	}
+
+	.warning-header {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-bottom: 10px;
+	}
+
+	.warning-icon {
+		font-size: 16px;
+		flex-shrink: 0;
+	}
+
+	.warning-text {
+		color: #856404;
+		font-size: 14px;
+		line-height: 1.4;
+	}
+
+	.existing-reviews-list {
+		margin-top: 8px;
+		margin-left: 24px; /* Align with text, accounting for icon */
+	}
+
+	.existing-review-item {
+		font-size: 12px;
+		color: #6c5700;
+		margin-bottom: 4px;
+	}
+
+	.existing-review-date {
+		font-weight: 500;
 	}
 
 	.ratings-grid {

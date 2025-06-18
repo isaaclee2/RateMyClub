@@ -3,37 +3,25 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
 
 export const handle = async ({ event, resolve }) => {
-    // Don't inject public Supabase client for admin routes
-    if (!event.url.pathname.startsWith('/admin')) {
-        event.locals.supabase = createSupabaseServerClient({
-            supabaseUrl: PUBLIC_SUPABASE_URL,
-            supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-            event,
-        })
-        /**
-         * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
-         * doesn't validate the JWT, this function validates the JWT by first calling
-         * `getUser` and aborts early if the JWT signature is invalid.
-         */
-        event.locals.safeGetSession = async () => {
-            const {
-                data: { user },
-                error,
-            } = await event.locals.supabase.auth.getUser()
-            if (error) {
-                return { session: null, user: null }
-            }
+    event.locals.supabase = createSupabaseServerClient({
+        supabaseUrl: PUBLIC_SUPABASE_URL,
+        supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+        event,
+    })
 
-            const {
-                data: { session },
-            } = await event.locals.supabase.auth.getSession()
-            return { session, user }
-        }
-    } else {
-        // For admin routes, provide empty session data
-        event.locals.safeGetSession = async () => {
+    event.locals.safeGetSession = async () => {
+        const {
+            data: { user },
+            error,
+        } = await event.locals.supabase.auth.getUser()
+        if (error) {
             return { session: null, user: null }
         }
+
+        const {
+            data: { session },
+        } = await event.locals.supabase.auth.getSession()
+        return { session, user }
     }
 
     return resolve(event, {
