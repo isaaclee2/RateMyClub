@@ -908,7 +908,7 @@
 	}
 	.container2 {
 		width: 40%;
-		padding: 10px;
+		padding: 0px;
 		margin-left: 0px;
 	}
 	.box {
