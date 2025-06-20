@@ -7,6 +7,3 @@ export default defineConfig({
 		cssCodeSplit: false
 	}
 });
-
-
-export default config;

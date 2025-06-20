@@ -909,7 +909,7 @@
 	.container2 {
 		width: 40%;
 		padding: 10px;
-		margin-left: 15px;
+		margin-left: 0px;
 	}
 	.box {
 		width: fit-content;
