@@ -504,7 +504,17 @@
 	</div>
 	<hr class="hr1" />
 	<div class="reviews-container">
-		<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
+		<div class="reviews-header-container">
+			<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
+			<!-- <select class="review-filter" bind:value={selectedFilter}>
+				<option value="0">All reviews</option>
+				<option value="1">1 star</option>
+				<option value="2">2 stars</option>
+				<option value="3">3 stars</option>
+				<option value="4">4 stars</option>
+				<option value="5">5 stars</option>
+			</select> -->
+		</div>
 		{#if data.reviews.length === 0}
 			<div class="no-reviews-content">
 				<div class="no-reviews">No reviews yet. Be the first to write one!</div>
@@ -1159,12 +1169,28 @@
 		color: #666;
 	}
 
+	.reviews-header-container {
+		display: flex;
+		flex-direction: row;
+	}
+
 	.reviews-header {
 		font-size: 30px;
 		margin-left: 20px;
 		margin-top: 20px;
 		padding-bottom: 20px;
 	}
+
+	/* .review-filter {
+		border-radius: 5px;
+		border-color: #999;
+		color: #444;
+		height: fit-content;
+		width: fit-content;
+		font-size: 14px;
+		margin-top: 22px;
+		margin-left: 40px;
+	} */
 
 	.no-reviews-content {
 		width: 100%;
@@ -1189,6 +1215,7 @@
 		flex-direction: column;
 		gap: 20px;
 		margin-bottom: 40px;
+		margin-top: 10px;
 	}
 
 	.review-item {

@@ -1,4 +1,6 @@
 <script>
+	import Fuse from 'fuse.js';
+
 	let { data } = $props();
 	let selectedCategory = $state('All Categories');
 	let searchQuery = $state('');
@@ -26,164 +28,37 @@
 		'Visual & Performing Arts',
 		'Viterbi Student Organization'
 	];
-	function createSlug(text) {
-		return text
-			.toLowerCase()
-			.replace(/[^\w\s-]/g, '')
-			.replace(/\s+/g, '-')
-			.replace(/-+/g, '-')
-			.trim();
-	}
 
-	function fuzzySearch(needle, haystack) {
-		if (!haystack) return { matched: false, quality: Infinity };
+	const fuseOptions = {
+		keys: [
+			{ name: 'name', weight: 0.7 }, // Higher weight for name matches
+			{ name: 'mission', weight: 0.2 }, // Lower weight for mission matches
+			{ name: 'categories', weight: 0.1 } // Lowest weight for category matches
+		],
+		threshold: 0.4, // 0 = exact match, 1 = match anything
+		distance: 100, // How far to search for matches
+		minMatchCharLength: 2, // Minimum character length for matches
+		includeScore: true, // Include match score in results
+		ignoreLocation: true, // Don't consider location of match in string
+		findAllMatches: true // Find all matches, not just first one
+	};
 
-		const needleLower = needle.toLowerCase();
-		const haystackLower = haystack.toLowerCase();
-
-		if (haystackLower.includes(needleLower)) {
-			const position = haystackLower.indexOf(needleLower);
-			return {
-				matched: true,
-				quality: position * 0.1
-			};
-		}
-
-		const words = haystack.split(/\s+/);
-		const acronym = words
-			.map((word) => word[0] || '')
-			.join('')
-			.toLowerCase();
-		if (acronym.includes(needleLower)) {
-			return { matched: true, quality: 1 };
-		}
-
-		const characters = needleLower.split('');
-		let index = 0;
-
-		for (let char of characters) {
-			index = haystackLower.indexOf(char, index);
-			if (index === -1) return { matched: false, quality: Infinity };
-			index++;
-		}
-
-		const lengthDifference = Math.abs(needle.length - haystack.length);
-		const consecutiveBonus = getConsecutiveMatches(needleLower, haystackLower);
-
-		const matchQuality = lengthDifference - consecutiveBonus * 2;
-
-		return { matched: true, quality: 10 + matchQuality };
-	}
-
-	function getConsecutiveMatches(needle, haystack) {
-		let consecutiveMatches = 0;
-		let maxConsecutive = 0;
-		let needleIndex = 0;
-
-		for (let i = 0; i < haystack.length; i++) {
-			if (needleIndex < needle.length && haystack[i] === needle[needleIndex]) {
-				consecutiveMatches++;
-				needleIndex++;
-				maxConsecutive = Math.max(maxConsecutive, consecutiveMatches);
-			} else {
-				consecutiveMatches = 0;
-			}
-		}
-
-		return maxConsecutive;
-	}
-
-	function searchClub(club, query) {
-		const terms = query.toLowerCase().split(/\s+/);
-
-		const nameResult = fuzzySearch(query, club.name);
-
-		let missionResult = { matched: false, quality: Infinity };
-		if (club.mission) {
-			missionResult = fuzzySearch(query, club.mission);
-			// Apply lower quality score (higher priority) if specific keywords are found
-			if (missionResult.matched) {
-				// Check for keyword matches in mission
-				for (const term of terms) {
-					if (club.mission.toLowerCase().includes(term)) {
-						// Boost quality for keyword matches
-						missionResult.quality *= 0.8;
-					}
-				}
-			}
-		}
-
-		// Check for keyword matches in name (highest boost)
-		if (nameResult.matched) {
-			for (const term of terms) {
-				if (club.name.toLowerCase().includes(term)) {
-					// Significant boost for keyword in name
-					nameResult.quality *= 0.5;
-				}
-			}
-		}
-
-		// Check if the club is of a specific type that matches the query
-		// For example, if query contains "consulting" and the club is a consulting club
-		let categoryBoost = 1;
-		if (club.categories) {
-			// For array of categories
-			if (Array.isArray(club.categories)) {
-				for (const category of club.categories) {
-					for (const term of terms) {
-						if (category.toLowerCase().includes(term)) {
-							categoryBoost = 0.7; // Boost for category match
-						}
-					}
-				}
-			}
-			// For string categories
-			else if (typeof club.categories === 'string') {
-				for (const term of terms) {
-					if (club.categories.toLowerCase().includes(term)) {
-						categoryBoost = 0.7; // Boost for category match
-					}
-				}
-			}
-		}
-
-		// Return the best match with any applicable boosts
-		if (nameResult.matched && missionResult.matched) {
-			const bestResult = nameResult.quality < missionResult.quality ? nameResult : missionResult;
-			bestResult.quality *= categoryBoost; // Apply category boost to final quality
-			return bestResult;
-		} else if (nameResult.matched) {
-			nameResult.quality *= categoryBoost;
-			return nameResult;
-		} else if (missionResult.matched) {
-			missionResult.quality *= categoryBoost;
-			return missionResult;
-		}
-
-		return { matched: false, quality: Infinity };
-	}
-
-	// Filter clubs based on search query and category
 	function filterClubs() {
 		if (!data || !data.clubs) {
 			filteredClubs = [];
 			return;
 		}
 
-		// Filter by category first
 		let categoryFiltered = data.clubs;
 		if (selectedCategory !== 'All Categories') {
 			categoryFiltered = data.clubs.filter((club) => {
 				if (!club.categories) return false;
 
-				// Handle array of categories
 				if (Array.isArray(club.categories)) {
 					return club.categories.includes(selectedCategory);
 				}
 
-				// Handle semicolon-separated string categories
 				if (typeof club.categories === 'string') {
-					// Split the string by semicolons and trim whitespace
 					const categoriesArray = club.categories.split(';').map((cat) => cat.trim());
 					return categoriesArray.includes(selectedCategory);
 				}
@@ -192,13 +67,10 @@
 			});
 		}
 
-		// Apply fuzzy search if there's a search query
 		if (searchQuery.trim() === '') {
 			filteredClubs = [...categoryFiltered].sort((a, b) => {
-				// First sort by review count (highest first)
 				const reviewCountDiff = (b.review_count || 0) - (a.review_count || 0);
 
-				// If review counts are the same, sort alphabetically by name
 				if (reviewCountDiff === 0) {
 					return a.name.localeCompare(b.name);
 				}
@@ -206,21 +78,13 @@
 				return reviewCountDiff;
 			});
 		} else {
-			// Get all clubs that match fuzzy search in name or mission
-			const searchResults = categoryFiltered
-				.map((club) => {
-					const result = searchClub(club, searchQuery);
-					return result.matched ? { ...club, matchQuality: result.quality } : null;
-				})
-				.filter((result) => result !== null);
+			const tempFuse = new Fuse(categoryFiltered, fuseOptions);
+			const searchResults = tempFuse.search(searchQuery);
 
-			// Sort by match quality (best matches first)
-			searchResults.sort((a, b) => a.matchQuality - b.matchQuality);
-			filteredClubs = searchResults;
+			filteredClubs = searchResults.map((result) => result.item);
 		}
 	}
 
-	// Watch for changes in data, searchQuery, and selectedCategory
 	$effect(() => {
 		if (data && data.clubs) {
 			filterClubs();
