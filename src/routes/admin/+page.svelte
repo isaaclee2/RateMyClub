@@ -29,8 +29,6 @@
 		return '★'.repeat(rating) + '☆'.repeat(5 - rating);
 	}
 
-	// Enhanced form submission with loading states (only runs on client)
-	// Enhanced form submission with loading states (only runs on client)
 	function enhancedSubmit() {
 		if (!browser) return enhance;
 
@@ -44,9 +42,7 @@
 				button.disabled = false;
 				button.textContent = originalText;
 
-				// Handle logout action specifically
 				if (action.search === '?/logout' && result.type === 'success') {
-					// Logout successful - the auth state change will handle the redirect
 					await invalidateAll();
 					return;
 				}

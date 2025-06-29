@@ -31,7 +31,7 @@ export async function load({ params, locals, url }) {
         .from('reviews')
         .select('*')
         .eq('club_id', clubData.id)
-        .order('time', { ascending: false });
+        .order('created_at', { ascending: false });
 
     if (reviewsError) {
         console.error("Error fetching reviews:", reviewsError);

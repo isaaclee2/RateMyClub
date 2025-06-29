@@ -118,6 +118,7 @@ export async function load({ parent }) {
 }
 
 async function recalculateClubStats(clubSlug) {
+    console.log('=== RECALCULATE FUNCTION CALLED FOR:', clubSlug, '===');
     try {
         console.log(`Recalculating stats for club: ${clubSlug}`);
 
@@ -164,16 +165,17 @@ async function recalculateClubStats(clubSlug) {
         const avgInclusivity = clubReviews.reduce((sum, r) => sum + r.inclusivity_rating, 0) / totalReviews;
         const avgDevelopment = clubReviews.reduce((sum, r) => sum + r.development_rating, 0) / totalReviews;
         const avgSocial = clubReviews.reduce((sum, r) => sum + r.social_rating, 0) / totalReviews;
-        const avgOverall = clubReviews.reduce((sum, r) => sum + r.overall_rating, 0) / totalReviews;
+        const avgOverallVibes = clubReviews.reduce((sum, r) => sum + r.overall_rating, 0) / totalReviews;
+        const avgOverall = (avgLeadership + avgInclusivity + avgDevelopment + avgSocial + avgOverallVibes) / 5
 
-        console.log(`Calculated averages for ${clubSlug}:`, {
-            totalReviews,
-            avgLeadership: avgLeadership.toFixed(2),
-            avgInclusivity: avgInclusivity.toFixed(2),
-            avgDevelopment: avgDevelopment.toFixed(2),
-            avgSocial: avgSocial.toFixed(2),
-            avgOverall: avgOverall.toFixed(2)
+        console.log('Individual averages:', {
+            avgLeadership,
+            avgInclusivity,
+            avgDevelopment,
+            avgSocial,
+            avgOverallVibes
         });
+        console.log('Calculated avgOverall:', avgOverall);
 
         // Update club stats with correct column names
         const updateData = {
@@ -181,7 +183,7 @@ async function recalculateClubStats(clubSlug) {
             inclusivity_rating: Math.round(avgInclusivity * 100) / 100,
             development_rating: Math.round(avgDevelopment * 100) / 100,
             social_rating: Math.round(avgSocial * 100) / 100,
-            overall_vibes_rating: Math.round(avgOverall * 100) / 100,
+            overall_vibes_rating: Math.round(avgOverallVibes * 100) / 100,
             overall_rating: Math.round(avgOverall * 100) / 100,
             review_count: totalReviews
         };
