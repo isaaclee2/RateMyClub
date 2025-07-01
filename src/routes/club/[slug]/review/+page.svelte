@@ -191,7 +191,6 @@
 				</div>
 			</div>
 			<div class="overall-rating-container">
-				<h1 class="overall-rating">★★★★★</h1>
 				<h1 class="overall-score">({data.club.overall_rating})</h1>
 				{#if data.reviews.length == 1}
 					<h1 class="number-of-ratings">{data.reviews.length} rating</h1>
@@ -566,12 +565,12 @@
 		display: flex;
 		flex-direction: row;
 	}
-	.overall-rating {
+	/* .overall-rating {
 		margin-left: 10px;
 		margin-top: -20px;
 		font-size: 35px;
 		color: #ffa534;
-	}
+	} */
 	.overall-score {
 		margin-left: 10px;
 		margin-top: -8px;
