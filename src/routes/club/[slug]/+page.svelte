@@ -102,7 +102,7 @@
 						>
 					{/each}
 				</h1>
-				<h1 class="overall-score">({data.club.overall_rating || 0})</h1>
+				<h1 class="overall-score">({(data.club.overall_rating || 0).toFixed(1)})</h1>
 				{#if data.reviews.length == 1}
 					<h1 class="number-of-ratings">{data.reviews.length} rating</h1>
 				{:else}
@@ -518,14 +518,14 @@
 	<div class="reviews-container">
 		<div class="reviews-header-container">
 			<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
-			<select class="review-filter" bind:value={selectedFilter}>
+			<!-- <select class="review-filter" bind:value={selectedFilter}>
 				<option value="0">All reviews</option>
 				<option value="1">1 star</option>
 				<option value="2">2 stars</option>
 				<option value="3">3 stars</option>
 				<option value="4">4 stars</option>
 				<option value="5">5 stars</option>
-			</select>
+			</select> -->
 		</div>
 		{#if data.reviews.length === 0}
 			<div class="no-reviews-content">
@@ -1200,7 +1200,7 @@
 		padding-bottom: 20px;
 	}
 
-	.review-filter {
+	/* .review-filter {
 		border-radius: 5px;
 		border-color: #999;
 		color: #444;
@@ -1209,7 +1209,7 @@
 		font-size: 14px;
 		margin-top: 22px;
 		margin-left: 40px;
-	}
+	} */
 
 	.no-reviews-content {
 		width: 100%;
