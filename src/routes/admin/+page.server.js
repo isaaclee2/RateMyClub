@@ -21,8 +21,6 @@ async function validateAdminAccess(locals) {
         }
 
         const adminEmails = ADMIN_EMAILS.split(',').map(email => email.trim().toLowerCase());
-        console.log('Admin emails from env:', adminEmails);
-        console.log('User email:', user.email);
 
         if (!adminEmails.includes(user.email.toLowerCase())) {
             console.log('User is not an admin');
@@ -118,7 +116,6 @@ export async function load({ parent }) {
 }
 
 async function recalculateClubStats(clubSlug) {
-    console.log('=== RECALCULATE FUNCTION CALLED FOR:', clubSlug, '===');
     try {
         console.log(`Recalculating stats for club: ${clubSlug}`);
 
@@ -168,14 +165,6 @@ async function recalculateClubStats(clubSlug) {
         const avgOverallVibes = clubReviews.reduce((sum, r) => sum + r.overall_rating, 0) / totalReviews;
         const avgOverall = (avgLeadership + avgInclusivity + avgDevelopment + avgSocial + avgOverallVibes) / 5
 
-        console.log('Individual averages:', {
-            avgLeadership,
-            avgInclusivity,
-            avgDevelopment,
-            avgSocial,
-            avgOverallVibes
-        });
-        console.log('Calculated avgOverall:', avgOverall);
 
         // Update club stats with correct column names
         const updateData = {
