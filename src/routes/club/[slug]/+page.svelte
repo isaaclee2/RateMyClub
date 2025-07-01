@@ -5,6 +5,7 @@
 	const user = $derived(data.session?.user);
 
 	let showSignInPopup = $state(false);
+	let selectedFilter = $state();
 
 	function openSignInPopup() {
 		showSignInPopup = true;
@@ -71,6 +72,17 @@
 			selectivity: mostFrequentSelectivity
 		};
 	});
+
+	let expandedReviews = $state(new Set());
+
+	function toggleReview(reviewId) {
+		if (expandedReviews.has(reviewId)) {
+			expandedReviews.delete(reviewId);
+		} else {
+			expandedReviews.add(reviewId);
+		}
+		expandedReviews = new Set(expandedReviews);
+	}
 </script>
 
 <div class="content-container">
@@ -506,14 +518,14 @@
 	<div class="reviews-container">
 		<div class="reviews-header-container">
 			<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
-			<!-- <select class="review-filter" bind:value={selectedFilter}>
+			<select class="review-filter" bind:value={selectedFilter}>
 				<option value="0">All reviews</option>
 				<option value="1">1 star</option>
 				<option value="2">2 stars</option>
 				<option value="3">3 stars</option>
 				<option value="4">4 stars</option>
 				<option value="5">5 stars</option>
-			</select> -->
+			</select>
 		</div>
 		{#if data.reviews.length === 0}
 			<div class="no-reviews-content">
@@ -550,7 +562,14 @@
 							</div>
 						</div>
 						<div class="review-content">
-							<p>{review.review_text}</p>
+							<p class="review-text" class:expanded={expandedReviews.has(review.id)}>
+								{review.review_text}
+							</p>
+							{#if review.review_text.length > 300}
+								<button class="read-more-btn" onclick={() => toggleReview(review.id)}>
+									{expandedReviews.has(review.id) ? 'Read less' : 'Read more'}
+								</button>
+							{/if}
 						</div>
 						<div class="review-criteria">
 							<div class="criteria-item">
@@ -1181,7 +1200,7 @@
 		padding-bottom: 20px;
 	}
 
-	/* .review-filter {
+	.review-filter {
 		border-radius: 5px;
 		border-color: #999;
 		color: #444;
@@ -1190,7 +1209,7 @@
 		font-size: 14px;
 		margin-top: 22px;
 		margin-left: 40px;
-	} */
+	}
 
 	.no-reviews-content {
 		width: 100%;
@@ -1282,6 +1301,38 @@
 
 	.review-content p {
 		margin: 0;
+	}
+	.review-text {
+		margin: 0;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		line-height: 1.6;
+		transition: all 0.3s ease;
+	}
+
+	.review-text.expanded {
+		/* stylelint-disable-next-line property-no-vendor-prefix */
+		-webkit-line-clamp: unset;
+		line-clamp: unset;
+		display: block;
+	}
+
+	.read-more-btn {
+		background: none;
+		border: none;
+		color: #c21807;
+		cursor: pointer;
+		font-size: 14px;
+		font-weight: 600;
+		margin-top: 8px;
+		padding: 0;
+	}
+
+	.read-more-btn:hover {
+		text-decoration: underline;
 	}
 
 	.review-criteria {
