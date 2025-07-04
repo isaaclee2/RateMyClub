@@ -66,6 +66,9 @@
 		</h1>
 	</a>
 
+	<!-- SC Logo-->
+	<img src="usc.jpg" alt="SC Logo" class="sc-logo" />
+
 	<!-- Desktop navigation (your original style) -->
 	<nav class="links">
 		<a href="/about">
@@ -230,6 +233,14 @@
 		align-items: center;
 		font-family: 'Mulish';
 		position: relative;
+	}
+
+	.sc-logo {
+		position: absolute;
+		top: 0;
+		left: 20px;
+		width: 300px; /* Tripled size (original was 50px) */
+		height: auto;
 	}
 
 	.title {
