@@ -5,7 +5,7 @@
 	const user = $derived(data.session?.user);
 
 	let showSignInPopup = $state(false);
-	let selectedFilter = $state();
+	let selectedFilter = $state('most_recent');
 
 	function openSignInPopup() {
 		showSignInPopup = true;
@@ -74,6 +74,34 @@
 	});
 
 	let expandedReviews = $state(new Set());
+
+	const sortedReviews = $derived(() => {
+		if (!data.reviews) return [];
+
+		return [...data.reviews].sort((a, b) => {
+			const avgA =
+				(a.leadership_rating +
+					a.inclusivity_rating +
+					a.development_rating +
+					a.social_rating +
+					a.overall_rating) / 5;
+			const avgB =
+				(b.leadership_rating +
+					b.inclusivity_rating +
+					b.development_rating +
+					b.social_rating +
+					b.overall_rating) / 5;
+
+			if (selectedFilter === 'highest_rating') {
+				return avgB - avgA;
+			} else if (selectedFilter === 'lowest_rating') {
+				return avgA - avgB;
+			} else {
+				// Most recent
+				return new Date(b.created_at) - new Date(a.created_at);
+			}
+		});
+	});
 
 	function toggleReview(reviewId) {
 		if (expandedReviews.has(reviewId)) {
@@ -518,22 +546,24 @@
 	<div class="reviews-container">
 		<div class="reviews-header-container">
 			<h1 class="reviews-header">Reviews ({data.reviews.length})</h1>
-			<!-- <select class="review-filter" bind:value={selectedFilter}>
-				<option value="0">All reviews</option>
-				<option value="1">1 star</option>
-				<option value="2">2 stars</option>
-				<option value="3">3 stars</option>
-				<option value="4">4 stars</option>
-				<option value="5">5 stars</option>
-			</select> -->
+			<div class="sort-controls">
+				<label for="sort-select" class="sort-label">Sort by:</label>
+				<select id="sort-select" class="review-sort-dropdown" bind:value={selectedFilter}>
+					<option value="most_recent">Most Recent</option>
+					<option value="highest_rating">Highest Rating</option>
+					<option value="lowest_rating">Lowest Rating</option>
+				</select>
+			</div>
 		</div>
+	
+		
 		{#if data.reviews.length === 0}
 			<div class="no-reviews-content">
 				<div class="no-reviews">No reviews yet. Be the first to write one!</div>
 			</div>
 		{:else}
 			<div class="reviews-list">
-				{#each data.reviews as review}
+				{#each sortedReviews() as review}
 					{@const avgRating =
 						(review.leadership_rating +
 							review.inclusivity_rating +
@@ -1395,6 +1425,37 @@
 		background-color: #f9f3e6;
 		color: #dc9301;
 	}
+
+	.reviews-header-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		text-align: right;
+		padding: 0 10px;
+		margin-bottom: 10px;
+	}
+
+	.sort-controls {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		font-size: 20px;
+	}
+
+	.sort-label {
+		font-weight: 500;
+		color: #333;
+	}
+
+	.review-sort-dropdown {
+		padding: 5px 30px 5px 15px;
+		font-size: 13px;
+		border: 1px solid #ccc;
+		border-radius: 6px;
+		background-color: white;
+		text-align: left;
+	}
+
 
 	@media (max-width: 768px) {
 		.container1 {

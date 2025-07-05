@@ -1,4 +1,5 @@
 import { supabase } from '$lib/supabaseClient';
+import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params }) {
@@ -13,12 +14,12 @@ export async function load({ params }) {
 
     if (clubError) {
         console.error(clubError);
-        return {
-            status: 404,
-            error: new Error('Club not found'),
-        };
+        throw error(404, {
+            message: 'Club not found'
+        });
     }
 
+    // Only fetch reviews if we have a valid club
     const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')
@@ -27,6 +28,9 @@ export async function load({ params }) {
 
     if (reviewsError) {
         console.error("Error fetching reviews:", reviewsError);
+        throw error(500, {
+            message: 'Error fetching reviews'
+        });
     }
 
     return {
