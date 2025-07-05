@@ -1,4 +1,2 @@
 RateMyClub for USC
-Sveltekit + Supabase
-
-test
+Powered by Sveltekit + Supabase
