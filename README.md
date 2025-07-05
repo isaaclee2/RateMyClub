@@ -1,2 +1,2 @@
-RateMyClub for USC
+RateMyClub for USC  
 Powered by Sveltekit + Supabase
